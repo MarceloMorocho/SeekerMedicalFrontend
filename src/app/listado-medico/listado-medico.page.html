@@ -1,0 +1,281 @@
+<div class="ion-page" id="main-content">
+  <ion-header>
+    <ion-toolbar>
+      <!-- Menú 1 en el lado izquierdo -->
+      <ion-buttons slot="start" >
+        <ion-menu-button (click)="abrirMenuIzquierdo()" auto-hide="false"></ion-menu-button>
+        <div class="logotipo_toolbar">
+          <ion-img src="assets/imagenes/logotipo.png" alt="Logo Seeker Medical"></ion-img>
+        </div>
+      </ion-buttons>
+      <!-- Menú 2 en el lado derecho -->
+      <ion-buttons slot="end">
+        <ion-menu-button (click)="abrirMenuDerecho()" auto-hide="false">
+          <ion-icon name="options-outline"></ion-icon>
+        </ion-menu-button>
+      </ion-buttons>
+      <ion-title class="ion-hide">listado-medico</ion-title>
+    </ion-toolbar>
+  </ion-header>
+  <ion-content class="contenido_fondo">
+    <ion-row>
+      <ion-col>
+        <ion-searchbar [(ngModel)]="filtrosAplicados" readonly="true" show-clear-button="always" (ionClear)="resetearFiltros()">
+          <p>Filtros aplicados</p>
+        </ion-searchbar>
+      </ion-col>
+    </ion-row>
+    <ng-container *ngIf="mostrarListado">
+      <ion-item lines="none" *ngFor="let medico of listaMedicos" (click)="irAInformacionMedico(medico)"> 
+        <ion-list (click)="irAInformacionMedico(medico)" [class.medico_seleccionado]="medico === medicoSeleccionado">
+          <ion-row>
+            <ion-col size="4">
+              <ion-avatar>
+                <ion-img class="img_usuario_listado" [src]="medico.medFotografiaURL" alt="Foto del médico"></ion-img>
+              </ion-avatar>
+              <h2 class="texto_centrado">
+                <b [style.color]="estaAbierto(medico) ? 'var(--ion-color-success)' : 'var(--ion-color-danger)'">
+                  {{ estaAbierto(medico) ? 'Abierto' : 'Cerrado' }}
+                </b>
+              </h2>
+            </ion-col>
+            <ion-col>
+              <h2 class="nombre_medico">{{ medico.medDenominacion }} {{ medico.medNombres }} {{ medico.medApellidos }}</h2>
+              <ion-row>
+                <ion-col *ngFor="let especialidad of medico.espMedMedicos">
+                  <p *ngIf="especialidad.emDescripcion" class="texto_cursiva_izquierda">{{ especialidad.emDescripcion }}</p>
+                </ion-col>
+                <ion-col *ngIf="ubicacionActivada">
+                  <p class="texto_derecha" *ngIf="medico.distanciaDesdeUsuario?.valor && medico.distanciaDesdeUsuario?.unidad">
+                    <ion-img class="img_distancia" src="assets/imagenes/distancia.png" alt="Distancia"></ion-img>
+                    {{ medico.distanciaDesdeUsuario.valor | number: '1.2-2' }} {{ medico.distanciaDesdeUsuario.unidad }}
+                  </p>
+                </ion-col>                           
+              </ion-row>
+            </ion-col>
+          </ion-row>
+          <ion-row class="ion_row_margen"> 
+            <ion-col *ngIf="medico.horariosAtencion && medico.horariosAtencion.length > 0">
+              <div *ngFor="let horario of medico.horariosAtencion">
+                <!-- Agregado: Mostrar p solo si hay diaDescripcion -->            
+                <p class="horario1" *ngIf="horario.diaDescripcion">{{ horario.diaDescripcion ? '' + horario.diaDescripcion : '' }}</p>
+                <p class="horario2" *ngIf="horario.hm1Inicio || horario.hm1Fin">{{ horario.hm1Inicio ? '' + horario.hm1Inicio : '' }} {{ horario.hm1Fin ? ' a ' + horario.hm1Fin : '' }}</p>
+                <p class="horario3" *ngIf="horario.hm2Inicio || horario.hm2Fin">{{ horario.hm2Inicio ? '- ' + horario.hm2Inicio : '' }} {{ horario.hm2Fin ? ' a ' + horario.hm2Fin : '' }}</p>                   
+                <br *ngIf="horario.diaDescripcion">
+              </div>
+            </ion-col>
+          </ion-row>
+        </ion-list>
+      </ion-item>
+    </ng-container>
+  </ion-content>
+  <ion-footer>
+    <ion-toolbar>
+      <ion-row>
+        <ion-col class="ion-text-start">
+          <ion-nav-link class="regresar" (click)="goVentanaPaciente()"><ion-icon name="chevron-back-outline"></ion-icon>  Regresar</ion-nav-link>
+        </ion-col>
+        <ion-col class="ion-text-end">
+          <ion-nav-link class="salir" (click)="alertaConfirmarSalida()">Salir  <ion-icon name="exit-outline"></ion-icon></ion-nav-link>
+        </ion-col>
+      </ion-row>
+    </ion-toolbar>
+  </ion-footer>
+</div>
+
+<!-- Despliegue de las opciones del menú -->
+<ion-menu menuId="menuIzquierdo" side="start" contentId="main-content">
+  <ion-header class="ion-hide">
+    <ion-toolbar>
+      <ion-title>Menú</ion-title>
+    </ion-toolbar>
+  </ion-header>
+  <ion-content class="contenido_fondo">
+    <ion-avatar class="avatar_usuario_menu">
+      <ion-img class="img_usuario" [src]="paciente?.pacFotografiaURL" alt="Foto del paciente"></ion-img>
+    </ion-avatar>
+    <p class="msg_bienvenida titulo_paginas ion-text-center">{{ paciente?.pacNombres }} {{ paciente?.pacApellidos }}</p>
+    <ion-list>
+      <ion-item button id="popover_menu_farmacia" lines="none">
+        <ion-img class="img_menu" src="assets/imagenes/busca_farmacia.png" alt="Buscar farmacia"></ion-img>
+        <p class="ion-text-start">Buscar farmacias</p>
+      </ion-item>
+      <!-- Despliegue del ion-popover para buscar farmacias -->
+      <!-- dismissOnSelect es una propiedad para cerrar automáticamente la ventana emergente cuando se hace clic en su contenido -->
+      <ion-popover trigger="popover_menu_farmacia" [dismissOnSelect]="true">
+        <ng-template>
+          <ion-content>
+            <h2 class="msg_bienvenida titulo_paginas ion-text-center">¿Cómo deseas realizar la búsqueda?</h2>
+            <ion-list>
+              <ion-item button (click)="goBuscarFarmaciaListado()">
+                <ion-img class="img_busqueda" src="assets/imagenes/busqueda_listado.png" alt="Búsqueda mediante un listado"></ion-img>
+                <p class="ion-text-start">Mediante un listado</p>
+              </ion-item>
+              <ion-item button (click)="goBuscarFarmaciaMapa()">
+                <ion-img class="img_busqueda" src="assets/imagenes/busqueda_mapa.png" alt="Búsqueda mediante un mapa"></ion-img>
+                <p class="ion-text-start">Mediante un mapa</p>
+              </ion-item>
+            </ion-list>
+          </ion-content>
+        </ng-template>
+      </ion-popover>
+      <ion-item button id="popover_menu_medico" lines="none">
+        <ion-img class="img_menu" src="assets/imagenes/busca_medico.png" alt="Buscar medico"></ion-img>
+        <p class="ion-text-start">Buscar médicos</p>
+      </ion-item>
+      <!-- Despliegue del ion-popover para buscar médicos -->
+      <!-- dismissOnSelect es una propiedad para cerrar automáticamente la ventana emergente cuando se hace clic en su contenido -->
+      <ion-popover trigger="popover_menu_medico" [dismissOnSelect]="true">
+        <ng-template>
+          <ion-content>
+            <h2 class="msg_bienvenida titulo_paginas ion-text-center">¿Cómo deseas realizar la búsqueda?</h2>
+            <ion-list>
+              <ion-item button (click)="goBuscarMedicoListado()">
+                <ion-img class="img_busqueda" src="assets/imagenes/busqueda_listado.png" alt="Búsqueda mediante listado"></ion-img>
+                <p class="ion-text-start">Mediante un listado</p>
+              </ion-item>
+              <ion-item button (click)="goBuscarMedicoMapa()">
+                <ion-img class="img_busqueda" src="assets/imagenes/busqueda_mapa.png" alt="Búsqueda mediante mapa"></ion-img>
+                <p class="ion-text-start">Mediante un mapa</p>
+              </ion-item>
+            </ion-list>
+          </ion-content>
+        </ng-template>
+      </ion-popover>
+      <ion-item button lines="none" (click)="goGestionarPerfil()">
+        <ion-img class="img_menu" src="assets/imagenes/gestiona_perfil.png" alt="Gestionar perfil de usuario"></ion-img>
+        <p class="ion-text-start">Gestionar mi perfil de usuario</p>
+      </ion-item>
+      <ion-item button lines="none" (click)="goResetearClave()">
+        <ion-img class="img_menu" src="assets/imagenes/reset_clave.png" alt="Resetear clave de ingreso"></ion-img>
+        <p class="ion-text-start">Resetear mi clave de ingreso</p>
+      </ion-item>
+      <ion-item button lines="none" (click)="alertaConfirmarSalida()">
+        <ion-img class="img_menu" src="assets/imagenes/salir.png" alt="Salir"></ion-img>
+        <p class="ion-text-start">Salir</p>
+      </ion-item>
+      <ion-header class="ion-hide">
+        <ion-toolbar>
+          <ion-title>Menú</ion-title>
+        </ion-toolbar>
+      </ion-header>
+      <ion-content class="contenido_fondo">
+        <ion-avatar class="avatar_usuario_menu">
+          <ion-img class="img_usuario" [src]="paciente?.pacFotografiaURL" alt="Foto del paciente"></ion-img>
+        </ion-avatar>
+        <p class="msg_bienvenida titulo_paginas ion-text-center">{{ paciente?.pacNombres }} {{ paciente?.pacApellidos }}</p>
+        <ion-list>
+          <ion-item button id="popover_menu_farmacia" lines="none">
+            <ion-img class="img_menu" src="assets/imagenes/busca_farmacia.png" alt="Buscar farmacia"></ion-img>
+            <p class="ion-text-start">Buscar farmacias</p>
+          </ion-item>
+          <!-- Despliegue del ion-popover para buscar farmacias -->
+          <!-- dismissOnSelect es una propiedad para cerrar automáticamente la ventana emergente cuando se hace clic en su contenido -->
+          <ion-popover trigger="popover_menu_farmacia" [dismissOnSelect]="true">
+            <ng-template>
+              <ion-content>
+                <h2 class="msg_bienvenida titulo_paginas ion-text-center">¿Cómo deseas realizar la búsqueda?</h2>
+                <ion-list>
+                  <ion-item button (click)="goBuscarFarmaciaListado()">
+                    <ion-img class="img_busqueda" src="assets/imagenes/busqueda_listado.png" alt="Búsqueda mediante un listado"></ion-img>
+                    <p class="ion-text-start">Mediante un listado</p>
+                  </ion-item>
+                  <ion-item button (click)="goBuscarFarmaciaMapa()">
+                    <ion-img class="img_busqueda" src="assets/imagenes/busqueda_mapa.png" alt="Búsqueda mediante un mapa"></ion-img>
+                    <p class="ion-text-start">Mediante un mapa</p>
+                  </ion-item>
+                </ion-list>
+              </ion-content>
+            </ng-template>
+          </ion-popover>
+          <ion-item button id="popover_menu_medico" lines="none">
+            <ion-img class="img_menu" src="assets/imagenes/busca_medico.png" alt="Buscar medico"></ion-img>
+            <p class="ion-text-start">Buscar médicos</p>
+          </ion-item>
+          <!-- Despliegue del ion-popover para buscar médicos -->
+          <!-- dismissOnSelect es una propiedad para cerrar automáticamente la ventana emergente cuando se hace clic en su contenido -->
+          <ion-popover trigger="popover_menu_medico" [dismissOnSelect]="true">
+            <ng-template>
+              <ion-content>
+                <h2 class="msg_bienvenida titulo_paginas ion-text-center">¿Cómo deseas realizar la búsqueda?</h2>
+                <ion-list>
+                  <ion-item button (click)="goBuscarMedicoListado()">
+                    <ion-img class="img_busqueda" src="assets/imagenes/busqueda_listado.png" alt="Búsqueda mediante listado"></ion-img>
+                    <p class="ion-text-start">Mediante un listado</p>
+                  </ion-item>
+                  <ion-item button (click)="goBuscarMedicoMapa()">
+                    <ion-img class="img_busqueda" src="assets/imagenes/busqueda_mapa.png" alt="Búsqueda mediante mapa"></ion-img>
+                    <p class="ion-text-start">Mediante un mapa</p>
+                  </ion-item>
+                </ion-list>
+              </ion-content>
+            </ng-template>
+          </ion-popover>
+          <ion-item button lines="none" (click)="goGestionarPerfil()">
+            <ion-img class="img_menu" src="assets/imagenes/gestiona_perfil.png" alt="Gestionar perfil de usuario"></ion-img>
+            <p class="ion-text-start">Gestionar mi perfil de usuario</p>
+          </ion-item>
+          <ion-item button lines="none" (click)="goResetearClave()">
+            <ion-img class="img_menu" src="assets/imagenes/reset_clave.png" alt="Resetear clave de ingreso"></ion-img>
+            <p class="ion-text-start">Resetear mi clave de ingreso</p>
+          </ion-item>
+          <ion-item button lines="none" (click)="alertaConfirmarSalida()">
+            <ion-img class="img_menu" src="assets/imagenes/salir.png" alt="Salir"></ion-img>
+            <p class="ion-text-start">Salir</p>
+          </ion-item>
+        </ion-list>
+      </ion-content>
+    </ion-list>
+  </ion-content>
+</ion-menu>
+
+<!-- Despliegue de las opciones del filtro listado médico -->
+<ion-menu menuId="menuDerecho" side="end" contentId="main-content">
+  <ion-header>
+    <ion-toolbar>
+      <ion-title class="ion-hide"></ion-title>
+      <ion-nav-link (click)="goListadoMedico()">
+        <p class="filtrar ion-text-center">Filtrar</p>
+      </ion-nav-link>
+    </ion-toolbar>
+  </ion-header>
+  <ion-content class="contenido_fondo">
+    <ion-row>
+      <ion-col>
+        <p class="titulo_paginas">Especialidad:</p>
+        <ion-item lines="full">
+          <ion-select [(ngModel)]="selectedEspecialidad" name="selectedEspecialidad" [multiple]="false" required="true" placeholder="Elija una especialidad">
+            <ion-select-option *ngFor="let especialidad of especialidades" [value]="especialidad">
+              <p>{{ especialidad }}</p>
+            </ion-select-option>
+          </ion-select>
+        </ion-item>
+      </ion-col>
+    </ion-row>
+    <ion-row>
+      <ion-col>
+        <p class="titulo_paginas">Características del servicio</p>
+        <ion-list lines="none">
+          <ion-item>
+            <ion-label class="ion-text-right">¿Atención a domicilio?</ion-label>
+            <ion-toggle [(ngModel)]="atencionDomicilio" name="atencionDomicilio" color="success" [enableOnOffLabels]="true">¿Atención a domicilio?</ion-toggle>
+          </ion-item>
+          <ion-item>
+            <ion-label class="ion-text-right">¿Servicios de enfermería?</ion-label>
+            <ion-toggle [(ngModel)]="servicioEnfermeria" name="serviciosEnfermeria" color="success" [enableOnOffLabels]="true">¿Servicios de enfermería?</ion-toggle>
+          </ion-item>
+          <ion-item>
+            <ion-label class="ion-text-right">¿Farmacia / Medicación?</ion-label>
+            <ion-toggle [(ngModel)]="farmaciaMedicacion" name="farmaciaMedicacion" color="success" [enableOnOffLabels]="true">¿Farmacia / Medicación?</ion-toggle>
+          </ion-item>
+          <ion-item>
+            <ion-label class="ion-text-right">¿Servicios médicos 24/7?</ion-label>
+            <ion-toggle [(ngModel)]="atencion247" name="Atencion247" color="success" [enableOnOffLabels]="true">¿Servicios médicos 24/7?</ion-toggle>
+          </ion-item>
+        </ion-list>
+        <!-- Botón para aplicar filtros -->
+        <ion-button type="button" color="light" expand="block" (click)="aplicarFiltros()" shape="round" size="large">Aplicar Filtros</ion-button>
+      </ion-col>
+    </ion-row>
+  </ion-content>
+</ion-menu>

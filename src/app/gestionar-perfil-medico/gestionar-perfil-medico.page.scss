@@ -1,0 +1,16 @@
+/* Transparencia del ion-list */
+ion-list {
+  background: transparent;
+}
+
+/* Estilo para centrar el botón */
+.centrar_button {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Estilo para texto del ion-label del radio Doctor, Doctora */
+.texto_negro{
+  color: black;
+}

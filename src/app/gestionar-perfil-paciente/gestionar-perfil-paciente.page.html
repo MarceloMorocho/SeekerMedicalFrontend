@@ -1,0 +1,245 @@
+<div class="ion-page" id="main-content">
+  <ion-header>
+    <ion-toolbar>
+      <!-- Menú 1 en el lado izquierdo -->
+      <ion-buttons slot="start" >
+        <ion-menu-button (click)="abrirMenuIzquierdo()" auto-hide="false"></ion-menu-button>
+        <div class="logotipo_toolbar">
+          <ion-img src="assets/imagenes/logotipo.png" alt="Logo SeekerMedical"></ion-img>
+        </div>
+      </ion-buttons>
+      <ion-title class="ion-hide">gestionar-perfil-paciente</ion-title>
+    </ion-toolbar>
+  </ion-header>
+  <ion-content class="contenido_fondo">
+    <ion-row>
+      <ion-col size="4">
+        <ion-img class="img_gestionarPerfil" src="assets/imagenes/gestiona_perfil.png" alt="Gestionar perfil de usuario"></ion-img>
+      </ion-col>
+      <ion-col size="5" class="text-left">
+        <h2 class="titulo_paginas">Gestionar mi perfil de usuario</h2>
+      </ion-col>
+    </ion-row>
+    <!-- Formulario para actualizar la información del paciente -->
+    <form (ngSubmit)="actualizarPaciente()">
+      <ion-grid class="vertical_top">
+        <ion-row>
+          <ion-col>
+            <h2 class="titulo_paginas">Información personal</h2>
+            <ion-item lines="full">
+              <ion-label position="floating" color="dark">Nombres (*)</ion-label>
+              <ion-input [(ngModel)]="paciente.pacNombres" name="pacNombres" type="text" autofocus="on" clearInput="true" clearOnEdit="true" color="dark" inputmode="text" placeholder="Primer y segundo nombre" required="true" (ionBlur)="validarCamposObligatorios(); validarNombres()"></ion-input>
+            </ion-item>
+            <div *ngIf="pacNombresInvalido">
+              <p style="color: red">El nombre debe tener mínimo 3 caracteres</p> 
+            </div>
+            <ion-item lines="full">
+              <ion-label position="floating" color="dark">Apellidos (*)</ion-label>
+              <ion-input [(ngModel)]="paciente.pacApellidos" name="pacApellidos" type="text" autofocus="on" clearInput="true" clearOnEdit="true" color="dark" inputmode="text" placeholder="Primer y segundo apellido" required="true" (ionBlur)="validarCamposObligatorios(); validarApellidos()"></ion-input>
+            </ion-item>
+            <div *ngIf="pacApellidosInvalido">
+              <p style="color: red">El apellido debe tener mínimo 3 caracteres</p> 
+            </div>
+            <ion-item lines="full">
+              <ion-label position="floating" color="dark">Cédula de identidad (*)</ion-label>
+              <ion-input [(ngModel)]="paciente.pacCi" name="pacCi" type="text" autofocus="on" clearInput="true" clearOnEdit="true" color="dark" inputmode="text" placeholder="Cédula" required="true" (ionBlur)="validarCedulaEcuatorianaYExistencia(); validarCamposObligatorios()"></ion-input>
+            </ion-item>
+            <ion-item lines="full">
+              <ion-label position="floating" color="dark">Correo electrónico (*)</ion-label>
+              <ion-input [(ngModel)]="paciente.pacCorreoElec" name="pacCorreoElec" type="email" autofocus="on" clearInput="true" clearOnEdit="true" color="dark" inputmode="text" placeholder="Correo personal" required="true" (ionBlur)="validarCorreoElec(); validarCamposObligatorios()"></ion-input>
+            </ion-item>
+            <ion-item lines="full">
+              <ion-label position="floating" color="dark">Teléfono móvil (*)</ion-label>
+              <ion-input [(ngModel)]="paciente.pacTelefonoMov" name="pacTelefonoMov" type="text" autofocus="on" clearInput="true" clearOnEdit="true" color="dark" inputmode="text" placeholder="xxxxxxxxxx" required="true" (ionBlur)="validarCamposObligatorios(); validarTelefonoMov()"></ion-input>
+            </ion-item>
+            <!-- Texto de alerta cuando el número de teléfono móvil sea inválido -->
+            <div *ngIf="pacTelefonoMovInvalido">
+              <p style="color: red">El número del teléfono móvil debe tener 10 dígitos</p> 
+            </div>
+            <ion-item lines="full">
+              <!-- lazy-loading o carga diferida: técnica que pospone la carga de recursos no esenciales. Estos recursos solo cargarán 
+                  a la hora de ser visualizados, es decir, cuando haga falta -->
+              <ion-label position="fixed" color="dark">Fotografía</ion-label>
+              <ion-icon lazy="true" name="image"></ion-icon>
+              <ion-input type="file"  accept="image/*" (change)="cargarFotografia($event)"></ion-input>
+            </ion-item>
+            <ion-item *ngIf="selectedFile">
+              <ion-avatar class="avatar_usuario_menu">
+                <ion-img [src]="selectedFile ? getSelectedFileUrl() : paciente.pacFotografiaURL" alt="Foto del paciente"></ion-img>
+              </ion-avatar>
+            </ion-item>
+            <ion-item *ngIf="!selectedFile && paciente.pacFotografiaURL">
+              <ion-avatar class="avatar_usuario_menu">
+                <ion-img [src]="paciente.pacFotografiaURL" alt="Foto del paciente"></ion-img>
+              </ion-avatar>
+            </ion-item>
+            <!-- Texto de alerta cuando no se complete los campos obligatorios -->
+            <div *ngIf="formInvalido">
+              <p style="color: red">Por favor, complete todos los campos obligatorios (*)</p>
+            </div>
+            <ion-button type="button" (click)="mostrarAlertaConfirmacion()" [disabled]="cedulaInvalido || correoInvalido || formInvalido || pacNombresInvalido || pacApellidosInvalido || pacTelefonoMovInvalido" color="secondary" expand="block" shape="round" size="large">Actualizar información</ion-button>
+          </ion-col>
+        </ion-row>
+      </ion-grid>
+    </form>
+    <!-- Referencias de íconos: <a href="https://www.flaticon.es/iconos-gratis/candidato" title="candidato iconos">Candidato iconos creados por Soodesign - Flaticon</a> -->
+  </ion-content>
+  <ion-footer>
+    <ion-toolbar>
+      <ion-row>
+        <ion-col class="ion-text-start">
+          <ion-nav-link class="regresar" (click)="goVentanaPaciente()"><ion-icon name="chevron-back-outline"></ion-icon>  Regresar</ion-nav-link>
+        </ion-col>
+        <ion-col class="ion-text-end">
+          <ion-nav-link class="salir" (click)="alertaConfirmarSalida()">Salir  <ion-icon name="exit-outline"></ion-icon></ion-nav-link>
+        </ion-col>
+      </ion-row>
+    </ion-toolbar>
+  </ion-footer>
+</div>
+
+<!-- Despliegue de las opciones del menú -->
+<ion-menu menuId="menuIzquierdo" side="start" contentId="main-content">
+  <ion-header class="ion-hide">
+    <ion-toolbar>
+      <ion-title>Menú</ion-title>
+    </ion-toolbar>
+  </ion-header>
+  <ion-content class="contenido_fondo">
+    <ion-avatar class="avatar_usuario_menu">
+      <ion-img class="img_usuario" [src]="paciente?.pacFotografiaURL" alt="Foto del paciente"></ion-img>
+    </ion-avatar>
+    <p class="msg_bienvenida titulo_paginas ion-text-center">{{ paciente?.pacNombres }} {{ paciente?.pacApellidos }}</p>
+    <ion-list>
+      <ion-item button id="popover_menu_farmacia" lines="none">
+        <ion-img class="img_menu" src="assets/imagenes/busca_farmacia.png" alt="Buscar farmacia"></ion-img>
+        <p class="ion-text-start">Buscar farmacias</p>
+      </ion-item>
+      <!-- Despliegue del ion-popover para buscar farmacias -->
+      <!-- dismissOnSelect es una propiedad para cerrar automáticamente la ventana emergente cuando se hace clic en su contenido -->
+      <ion-popover trigger="popover_menu_farmacia" [dismissOnSelect]="true">
+        <ng-template>
+          <ion-content>
+            <h2 class="msg_bienvenida titulo_paginas ion-text-center">¿Cómo deseas realizar la búsqueda?</h2>
+            <ion-list>
+              <ion-item button (click)="goBuscarFarmaciaListado()">
+                <ion-img class="img_busqueda" src="assets/imagenes/busqueda_listado.png" alt="Búsqueda mediante un listado"></ion-img>
+                <p class="ion-text-start">Mediante un listado</p>
+              </ion-item>
+              <ion-item button (click)="goBuscarFarmaciaMapa()">
+                <ion-img class="img_busqueda" src="assets/imagenes/busqueda_mapa.png" alt="Búsqueda mediante un mapa"></ion-img>
+                <p class="ion-text-start">Mediante un mapa</p>
+              </ion-item>
+            </ion-list>
+          </ion-content>
+        </ng-template>
+      </ion-popover>
+      <ion-item button id="popover_menu_medico" lines="none">
+        <ion-img class="img_menu" src="assets/imagenes/busca_medico.png" alt="Buscar medico"></ion-img>
+        <p class="ion-text-start">Buscar médicos</p>
+      </ion-item>
+      <!-- Despliegue del ion-popover para buscar médicos -->
+      <!-- dismissOnSelect es una propiedad para cerrar automáticamente la ventana emergente cuando se hace clic en su contenido -->
+      <ion-popover trigger="popover_menu_medico" [dismissOnSelect]="true">
+        <ng-template>
+          <ion-content>
+            <h2 class="msg_bienvenida titulo_paginas ion-text-center">¿Cómo deseas realizar la búsqueda?</h2>
+            <ion-list>
+              <ion-item button (click)="goBuscarMedicoListado()">
+                <ion-img class="img_busqueda" src="assets/imagenes/busqueda_listado.png" alt="Búsqueda mediante listado"></ion-img>
+                <p class="ion-text-start">Mediante un listado</p>
+              </ion-item>
+              <ion-item button (click)="goBuscarMedicoMapa()">
+                <ion-img class="img_busqueda" src="assets/imagenes/busqueda_mapa.png" alt="Búsqueda mediante mapa"></ion-img>
+                <p class="ion-text-start">Mediante un mapa</p>
+              </ion-item>
+            </ion-list>
+          </ion-content>
+        </ng-template>
+      </ion-popover>
+      <ion-item button lines="none" (click)="goGestionarPerfil()">
+        <ion-img class="img_menu" src="assets/imagenes/gestiona_perfil.png" alt="Gestionar perfil de usuario"></ion-img>
+      <p class="ion-text-start">Gestionar mi perfil de usuario</p>
+      </ion-item>
+      <ion-item button lines="none" (click)="goResetearClave()">
+        <ion-img class="img_menu" src="assets/imagenes/reset_clave.png" alt="Resetear clave de ingreso"></ion-img>
+        <p class="ion-text-start">Resetear mi clave de ingreso</p>
+      </ion-item>
+      <ion-item button lines="none" (click)="alertaConfirmarSalida()">
+        <ion-img class="img_menu" src="assets/imagenes/salir.png" alt="Salir"></ion-img>
+        <p class="ion-text-start">Salir</p>
+      </ion-item>
+      <ion-header class="ion-hide">
+        <ion-toolbar>
+          <ion-title>Menú</ion-title>
+        </ion-toolbar>
+      </ion-header>
+      <ion-content class="contenido_fondo">
+        <ion-avatar class="avatar_usuario_menu">
+          <ion-img class="img_usuario" [src]="paciente?.pacFotografiaURL" alt="Foto del paciente"></ion-img>
+        </ion-avatar>
+        <p class="msg_bienvenida titulo_paginas ion-text-center">{{ paciente?.pacNombres }} {{ paciente?.pacApellidos }}</p>
+        <ion-list>
+          <ion-item button id="popover_menu_farmacia" lines="none">
+            <ion-img class="img_menu" src="assets/imagenes/busca_farmacia.png" alt="Buscar farmacia"></ion-img>
+            <p class="ion-text-start">Buscar farmacias</p>
+          </ion-item>
+          <!-- Despliegue del ion-popover para buscar farmacias -->
+          <!-- dismissOnSelect es una propiedad para cerrar automáticamente la ventana emergente cuando se hace clic en su contenido -->
+          <ion-popover trigger="popover_menu_farmacia" [dismissOnSelect]="true">
+            <ng-template>
+              <ion-content>
+                <h2 class="msg_bienvenida titulo_paginas ion-text-center">¿Cómo deseas realizar la búsqueda?</h2>
+                <ion-list>
+                  <ion-item button (click)="goBuscarFarmaciaListado()">
+                    <ion-img class="img_busqueda" src="assets/imagenes/busqueda_listado.png" alt="Búsqueda mediante un listado"></ion-img>
+                    <p class="ion-text-start">Mediante un listado</p>
+                  </ion-item>
+                  <ion-item button (click)="goBuscarFarmaciaMapa()">
+                    <ion-img class="img_busqueda" src="assets/imagenes/busqueda_mapa.png" alt="Búsqueda mediante un mapa"></ion-img>
+                    <p class="ion-text-start">Mediante un mapa</p>
+                  </ion-item>
+                </ion-list>
+              </ion-content>
+            </ng-template>
+          </ion-popover>
+          <ion-item button id="popover_menu_medico" lines="none">
+            <ion-img class="img_menu" src="assets/imagenes/busca_medico.png" alt="Buscar medico"></ion-img>
+            <p class="ion-text-start">Buscar médicos</p>
+          </ion-item>
+          <!-- Despliegue del ion-popover para buscar médicos -->
+          <!-- dismissOnSelect es una propiedad para cerrar automáticamente la ventana emergente cuando se hace clic en su contenido -->
+          <ion-popover trigger="popover_menu_medico" [dismissOnSelect]="true">
+            <ng-template>
+              <ion-content>
+                <h2 class="msg_bienvenida titulo_paginas ion-text-center">¿Cómo deseas realizar la búsqueda?</h2>
+                <ion-list>
+                  <ion-item button (click)="goBuscarMedicoListado()">
+                    <ion-img class="img_busqueda" src="assets/imagenes/busqueda_listado.png" alt="Búsqueda mediante listado"></ion-img>
+                    <p class="ion-text-start">Mediante un listado</p>
+                  </ion-item>
+                  <ion-item button (click)="goBuscarMedicoMapa()">
+                    <ion-img class="img_busqueda" src="assets/imagenes/busqueda_mapa.png" alt="Búsqueda mediante mapa"></ion-img>
+                    <p class="ion-text-start">Mediante un mapa</p>
+                  </ion-item>
+                </ion-list>
+              </ion-content>
+            </ng-template>
+          </ion-popover>
+          <ion-item button lines="none" (click)="goGestionarPerfil()">
+            <ion-img class="img_menu" src="assets/imagenes/gestiona_perfil.png" alt="Gestionar perfil de usuario"></ion-img>
+            <p class="ion-text-start">Gestionar mi perfil de usuario</p>
+          </ion-item>
+          <ion-item button lines="none" (click)="goResetearClave()">
+            <ion-img class="img_menu" src="assets/imagenes/reset_clave.png" alt="Resetear clave de ingreso"></ion-img>
+            <p class="ion-text-start">Resetear mi clave de ingreso</p>
+          </ion-item>
+          <ion-item button lines="none" (click)="alertaConfirmarSalida()">
+            <ion-img class="img_menu" src="assets/imagenes/salir.png" alt="Salir"></ion-img>
+            <p class="ion-text-start">Salir</p>
+          </ion-item>
+        </ion-list>
+      </ion-content>
+    </ion-list>
+  </ion-content>
+</ion-menu>

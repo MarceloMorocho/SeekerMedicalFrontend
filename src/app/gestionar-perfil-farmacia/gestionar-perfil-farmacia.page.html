@@ -1,0 +1,390 @@
+<div class="ion-page" id="main-content">
+  <ion-header>
+    <ion-toolbar>
+      <!-- Menú 1 en el lado izquierdo -->
+      <ion-buttons slot="start" >
+        <ion-menu-button (click)="abrirMenuIzquierdo()" auto-hide="false"></ion-menu-button>
+        <div class="logotipo_toolbar">
+          <ion-img src="assets/imagenes/logotipo.png" alt="Logo SeekerMedical"></ion-img>
+        </div>
+      </ion-buttons>
+      <ion-title class="ion-hide">gestionar-perfil-farmacia</ion-title>
+    </ion-toolbar>
+  </ion-header>
+  <ion-content class="contenido_fondo">
+    <ion-row>
+      <ion-col size="4">
+        <ion-img class="img_gestionarPerfil" src="assets/imagenes/gestiona_perfil.png" alt="Gestionar perfil de usuario"></ion-img>
+      </ion-col>
+      <ion-col size="5" class="text-left">
+        <h2 class="titulo_paginas">Gestionar mi perfil de usuario</h2>
+      </ion-col>
+    </ion-row>
+    <!-- Formulario para actualizar la información del médico -->
+    <form (ngSubmit)="actualizarFarmacia()">
+      <ion-grid class="vertical_top">    
+        <!-- Formulario que se habilita en el tab1 -->
+        <div id="tab1" class="ion-hide">
+          <ion-row>
+            <ion-col>
+              <h2 class="titulo_paginas">Información del negocio</h2>
+              <ion-item lines="full">
+                <ion-label position="floating" color="dark">RUC (*)</ion-label>
+                <ion-input [(ngModel)]="farmacia.farRuc" name="farRuc" type="text" autofocus="on" clearInput="true" clearOnEdit="true" color="dark" inputmode="numeric" placeholder="RUC" required="true" (ionBlur)="validarRucYExistencia(); validarCamposObligatorios()"></ion-input>
+              </ion-item>
+              <ion-item lines="full">
+                <ion-label position="floating" color="dark">Nombre del negocio (*)</ion-label>
+                <ion-input [(ngModel)]="farmacia.farNombreNegocio" name="farNombreNegocio" type="text" autofocus="on" clearInput="true" clearOnEdit="true" color="dark" inputmode="text" placeholder="Nombre del negocio o razón social" required="true" (ionBlur)="validarCamposObligatorios(); validarNombreNegocio()"></ion-input>
+              </ion-item>
+              <!-- Validación del nombre de negocio -->
+              <div *ngIf="farNombreNegocioInvalido">
+                <p style="color: red">El nombre del negocio debe tener mínimo 3 caracteres</p> 
+              </div>
+              <ion-item lines="full">
+                <ion-label position="floating" color="dark">Correo corporativo (*)</ion-label>
+                <ion-input [(ngModel)]="farmacia.farCorreoElec" name="farCorreoElec" type="email" autofocus="on" clearInput="true" clearOnEdit="true" color="dark" inputmode="text" placeholder="Correo corporativo" required="true" (ionBlur)="validarCorreoElec(); validarCamposObligatorios()"></ion-input>
+              </ion-item>
+              <ion-item lines="full">
+                <!-- lazy-loading o carga diferida: técnica que pospone la carga de recursos no esenciales. Estos recursos solo cargarán 
+                  a la hora de ser visualizados, es decir, cuando haga falta -->
+                <ion-label position="fixed" color="dark">Fotografía</ion-label>
+                <ion-icon lazy="true" name="image"></ion-icon>
+                <ion-input type="file"  accept="image/*" (change)="cargarLogotipo($event)"></ion-input>
+              </ion-item>
+              <ion-item *ngIf="selectedFile">
+                <ion-avatar class="avatar_usuario_menu">
+                  <ion-img [src]="selectedFile ? getSelectedFileUrl() : farmacia.farLogotipoURL" alt="Foto de la farmacia"></ion-img>
+                </ion-avatar>
+              </ion-item>
+              <ion-item *ngIf="!selectedFile && farmacia.farLogotipoURL">
+                <ion-avatar class="avatar_usuario_menu">
+                  <ion-img [src]="farmacia.farLogotipoURL" alt="Foto de la farmacia"></ion-img>
+                </ion-avatar>
+              </ion-item>
+              <!-- Texto de alerta cuando no se complete los campos obligatorios -->
+              <div *ngIf="formInvalido">
+                <p style="color: red">Por favor, complete todos los campos obligatorios (*)</p>
+              </div>
+            </ion-col>
+          </ion-row>
+        </div>
+
+        <!-- Formulario que se habilita en el tab2 -->
+        <div id="tab2" class="ion-hide">
+          <ion-row>
+            <ion-col>
+              <h2 class="titulo_paginas">Ubicación de tu farmacia</h2>
+              <ion-label position="floating" color="dark">Geolocalización (*)</ion-label>
+              <ion-row>
+                <ion-col>
+                  <ion-searchbar [(ngModel)]="buscarLugar" name="buscarLugar" placeholder="Buscar lugares o calles"></ion-searchbar>
+                </ion-col>
+              </ion-row>
+              <ion-row>
+                <ion-col class="ion-text-center">
+                  <ion-button (click)="buscarLugares()" type="button" color="success" shape="round" size="large">Buscar por nombre</ion-button>
+                </ion-col>
+                <ion-col class="ion-text-center">
+                  <ion-button (click)="ubicarAutomaticamente()" type="button" color="success" shape="round" size="large">Ubicación actual</ion-button>
+                </ion-col>
+              </ion-row>
+              <!-- <agm-map> se utiliza para crear un componente de mapa utilizando AGM.  -->
+              <agm-map [latitude]="farUbicacionLat" [longitude]="farUbicacionLon" [zoom]="15" [disableDefaultUI]="false">
+                <!-- <agm-marker> se utiliza para crear un marcador en el mapa -->
+                <agm-marker [latitude]="farUbicacionLat" [longitude]="farUbicacionLon" [markerDraggable]="true" (position_changed)="onMarkerPositionChanged($event)"></agm-marker>
+              </agm-map>
+            </ion-col>
+          </ion-row>
+          <ion-row>
+            <ion-col>
+              <p><b>Nombre del lugar: </b> <span>{{ nombre }}</span></p>
+              <p><b>Latitud: </b> <span>{{ farUbicacionLat }}</span></p>
+            </ion-col>
+            <ion-col>
+              <p><b>Dirección: </b> <span>{{ direccion }}</span></p>
+              <p><b>Longitud: </b> <span >{{ farUbicacionLon }}</span></p>
+            </ion-col>
+          </ion-row> 
+        </div>   
+
+        <!-- Formulario que se habilita en el tab3 -->
+        <div id="tab3" class="ion-hide">
+          <ion-row>
+            <ion-col>
+              <h2 class="titulo_paginas">Dirección de la farmacia y teléfonos de contacto</h2>
+              <ion-item lines="full">
+                <ion-label position="floating" color="dark">Calles (*)</ion-label>
+                <ion-input [(ngModel)]="farmacia.farDireccionCalles" name="farDireccionCalles" type="text" autofocus="on" clearInput="true" clearOnEdit="true" color="dark" inputmode="text"  placeholder="Calle principal y calle secundaria" required="true" (ionBlur)="validarCamposObligatorios(); validarDireccionCalles()"></ion-input>            
+              </ion-item>
+              <!-- Validación de la direccion de las calles -->
+              <div *ngIf="farDireccionCallesInvalido">
+                <p style="color: red">La dirección de las calles deben tener mínimo 5 caracteres</p> 
+              </div>
+              <ion-item lines="full">
+                <ion-label position="floating" color="dark">Edificio o institución / Nro de oficina / Piso (*)</ion-label>
+                <ion-input [(ngModel)]="farmacia.farDireccionCom" name="farDireccionCom"  type="text" autofocus="on" clearInput="true" clearOnEdit="true" color="dark" inputmode="text" placeholder="Ubicación específica del consultorio" required="true" (ionBlur)="validarCamposObligatorios(); validarDireccionCom()"></ion-input>
+              </ion-item>
+              <!-- Validación de la dirección del edificio, oficina, piso -->
+              <div *ngIf="farDireccionComInvalido">
+                <p style="color: red">El nombre del edificio, oficina y/o piso debe tener mínimo 3 caracteres</p> 
+              </div>
+              <ion-item lines="full">
+                <ion-label position="floating" color="dark">Referencia </ion-label>
+                <ion-input [(ngModel)]="farmacia.farDireccionRef" name="farDireccionRef" type="text" autofocus="on" clearInput="true" clearOnEdit="true" color="dark" inputmode="text" placeholder="Lugares de referencia (iglesia, escuela u otros) cercanos al consultorio" required="false"></ion-input>
+              </ion-item>
+            </ion-col>
+          </ion-row>
+          <ion-row>
+            <ion-col>
+              <ion-item lines="full">
+                <ion-label position="floating" color="dark">Teléfono fijo </ion-label>
+                <ion-input [(ngModel)]="farmacia.farTelefonoCon" name="farTelefonoCon" type="text" autofocus="on" clearInput="true" clearOnEdit="true" color="dark" inputmode="text" placeholder="(07)xxxxxxx" required="false" (ionBlur)="validarTelefonoCon()"></ion-input>
+              </ion-item>
+              <!-- Texto de alerta cuando el número de teléfono convencional sea inválido -->
+              <div *ngIf="farTelefonoConInvalido">
+                <p style="color: red">El número del teléfono convencional no es obligatorio, pero si desea ingresar debe tener 9 dígitos</p> 
+              </div>
+            </ion-col>
+            <ion-col>
+              <ion-item lines="full">
+                <ion-label position="floating" color="dark">Telefono móvil (*)</ion-label>
+                <ion-input [(ngModel)]="farmacia.farTelefonoMov" name="farTelefonoMov" type="text" autofocus="on" clearInput="true" clearOnEdit="true" color="dark" inputmode="text" placeholder="xxxxxxxxxx" required="true" (ionBlur)="validarCamposObligatorios(); validarTelefonoMov()"></ion-input>
+              </ion-item>
+              <!-- Texto de alerta cuando el número de teléfono móvil sea inválido -->
+              <div *ngIf="farTelefonoMovInvalido">
+                <p style="color: red">El número del teléfono móvil debe tener 10 dígitos</p> 
+              </div>
+            </ion-col>
+            <ion-col>
+              <ion-item lines="none">
+                <ion-label position="fixed">Whatsapp </ion-label>
+                <ion-toggle [(ngModel)]="farmacia.farTagW" name="farTagW" color="success" [enableOnOffLabels]="true">Whatsapp</ion-toggle>
+              </ion-item>
+            </ion-col>
+          </ion-row>
+          <!-- Texto de alerta cuando no se complete los campos obligatorios -->
+          <div *ngIf="formInvalido">
+            <p style="color: red">Por favor, complete todos los campos obligatorios (*)</p>
+          </div>
+        </div>
+
+        <!-- Formulario que se habilita en el tab4 -->
+        <div id="tab4" class="ion-hide">
+          <ion-row>
+            <ion-col>
+              <p class="titulo_paginas">Características del servicio (*)</p>
+              <ion-list lines="none">
+                <ion-item>
+                  <ion-label class="ion-text-right">¿Envío a domicilio?</ion-label>
+                  <ion-toggle [(ngModel)]="farmacia.farTagD" name="farTagD" color="success" [enableOnOffLabels]="true">¿Atención a domicilio?</ion-toggle>
+                </ion-item>
+                <ion-item>
+                  <ion-label class="ion-text-right">¿Atención 24/7?</ion-label>
+                  <ion-toggle [(ngModel)]="farmacia.farTag247" name="farTag247" color="success" [enableOnOffLabels]="true">¿Atención 24/7?</ion-toggle>
+                </ion-item>
+              </ion-list>
+            </ion-col>
+          </ion-row>
+          <ion-row>
+            <ion-col>
+              <p class="titulo_paginas">Horarios de atención (*)</p>
+            </ion-col>       
+          </ion-row>
+          <ion-row>
+            <ion-col>
+              <!-- Mostrar días y seleccionados -->
+              <div *ngIf="diasYHorariosSeleccionados.length > 0">
+                <ion-row>
+                  <ion-col>
+                    <ion-label><p class="titulo_paginas">Días</p></ion-label>
+                  </ion-col>
+                  <ion-col>
+                    <ion-label style="display: flex; justify-content: center; align-items: center;"><p class="titulo_paginas">Horarios</p></ion-label>
+                  </ion-col>
+                  <ion-col style="display: flex; justify-content: center; align-items: center;">
+                    <ion-label><p class="titulo_paginas">Opciones</p></ion-label>
+                  </ion-col>
+                </ion-row>
+                <ion-row *ngFor="let item of diasYHorariosSeleccionados; let i = index">
+                  <ion-col>
+                    <ion-label><p>{{ item.diaDescripcion }}</p></ion-label>
+                  </ion-col>
+                  <ion-col style="display: flex; justify-content: center; align-items: center;">
+                    <ion-label>
+                      <p>{{ item.hm1Inicio }} a {{ item.hm1Fin }}</p>
+                      <!-- Utiliza ngIf para condicionalmente mostrar la línea si hm2Inicio y hm2Fin tienen valores -->
+                      <p *ngIf="item.hm2Inicio && item.hm2Fin">{{ item.hm2Inicio }} a {{ item.hm2Fin }}</p>
+                    </ion-label>
+                  </ion-col>
+                  <ion-col style="display: flex; justify-content: center; align-items: center;">
+                    <ion-icon (click)="eliminarDiasYHorarios(i); validarCamposObligatorios()" name="trash" color="danger" size="small"></ion-icon>
+                  </ion-col>
+                </ion-row>
+              </div>
+              <div class="centrar_button">
+                <!-- (click)="agregarHorario()" --> 
+                <ion-button class="ancho_button" type="button" color="success" expand="block" shape="round" size="large" (click)="resetearHorario(); isModalOpenHorario = true"><ion-icon name="add" color="light">  </ion-icon> Agregar Horario</ion-button>
+              </div>
+              <!-- Texto de alerta cuando no se complete los campos obligatorios -->
+              <div *ngIf="formInvalido">
+                <p style="color: red">Por favor, complete todos los campos obligatorios y los horarios de atención (*)</p>
+              </div>           
+            </ion-col>
+          </ion-row>
+        </div>
+
+        <!-- Modal para el horario -->
+        <ion-modal [isOpen]="isModalOpenHorario">
+          <ng-template>
+            <ion-header>
+              <ion-toolbar>
+                <ion-icon name="chevron-back-outline" (click)="setOpenHorario(false)" slot="start"></ion-icon>
+                <ion-title class="ion-text-center">Agregar Horario</ion-title>
+              </ion-toolbar>
+            </ion-header>
+            <ion-content class="contenido_fondo">
+              <!-- Días de la semana -->
+              <ion-row class="ion-align-items-center">
+                <ion-col>
+                  <p class="ion-text-left">Días de la semana</p>
+                </ion-col>
+                <ion-col>
+                  <ion-list lines="none">
+                    <ion-item>
+                      <ion-label>Lunes</ion-label>
+                      <ion-checkbox slot="start" [(ngModel)]="diaDescripcion['Lunes']" name="Lunes"></ion-checkbox>
+                    </ion-item >
+                    <ion-item>
+                      <ion-label>Martes</ion-label>
+                      <ion-checkbox slot="start" [(ngModel)]="diaDescripcion['Martes']" name="Martes"></ion-checkbox>
+                    </ion-item>
+                    <ion-item>
+                      <ion-label>Miércoles</ion-label>
+                      <ion-checkbox slot="start" [(ngModel)]="diaDescripcion['Miércoles']" name="Miércoles"></ion-checkbox>
+                    </ion-item>
+                    <ion-item>
+                      <ion-label>Jueves</ion-label>
+                      <ion-checkbox slot="start" [(ngModel)]="diaDescripcion['Jueves']" name="Jueves"></ion-checkbox>
+                    </ion-item>
+                    <ion-item>
+                      <ion-label>Viernes</ion-label>
+                      <ion-checkbox slot="start" [(ngModel)]="diaDescripcion['Viernes']" name="Viernes"></ion-checkbox>
+                    </ion-item>
+                    <ion-item>
+                      <ion-label>Sábado</ion-label>
+                      <ion-checkbox slot="start" [(ngModel)]="diaDescripcion['Sábado']" name="Sábado"></ion-checkbox>
+                    </ion-item>
+                    <ion-item>
+                      <ion-label>Domingo</ion-label>
+                      <ion-checkbox slot="start" [(ngModel)]="diaDescripcion['Domingo']" name="Domingo"></ion-checkbox>
+                    </ion-item>
+                  </ion-list>
+                </ion-col>
+              </ion-row>
+              <!-- Intervalos de tiempo -->
+              <ion-row class="ion-align-items-center">
+                <ion-col>
+                  <p class="ion-text-left">Intervalos de tiempo</p>
+                </ion-col>
+                <ion-col>
+                  <ion-item class="borde_item">
+                    <ion-input  [(ngModel)]="hm1Inicio" name="hm1Inicio" class="text-center" type="text" autofocus="on" clearInput="true" clearOnEdit="true" color="dark" inputmode="numeric" placeholder="00:00"
+                    (input)="formatoHora($event, 'hm1Inicio')" required="true"></ion-input>
+                  </ion-item>
+                  <ion-item class="borde_item">
+                    <ion-input [(ngModel)]="hm2Inicio" name="hm2Inicio" class="text-center" type="text" autofocus="on" clearInput="true" clearOnEdit="true" color="dark" inputmode="numeric" placeholder="00:00"
+                    (input)="formatoHora($event, 'hm2Inicio')" required="true"></ion-input>
+                  </ion-item>
+                </ion-col>
+                <ion-col size="1.5">
+                  <ion-item lines="none">
+                    <p>a</p>
+                  </ion-item>
+                  <ion-item lines="none">
+                    <p>a</p>
+                  </ion-item>
+                </ion-col>
+                <ion-col>
+                  <ion-item class="borde_item">
+                    <ion-input [(ngModel)]="hm1Fin" name="hm1Fin" type="text" autofocus="on" clearInput="true" clearOnEdit="true" color="dark" inputmode="numeric" placeholder="00:00"
+                    (input)="formatoHora($event, 'hm1Fin')" required="true"></ion-input>
+                  </ion-item>
+                  <ion-item class="borde_item">
+                    <ion-input [(ngModel)]="hm2Fin" name="hm2Fin" type="text" autofocus="on" clearInput="true" clearOnEdit="true" color="dark" inputmode="numeric" placeholder="00:00"
+                    (input)="formatoHora($event, 'hm2Fin')" required="true"></ion-input>
+                  </ion-item>
+                </ion-col>
+              </ion-row>
+              <div class="centrar_button">
+                <ion-button class="ancho_button" type="button" color="success" expand="block" shape="round" size="large"  (click)="agregarDiasYHorarios()" (ionBlur)="validarCamposObligatorios()"><ion-icon name="add" color="light"></ion-icon>   Agregar</ion-button>
+              </div>
+            </ion-content>
+          </ng-template>
+        </ion-modal>
+
+        <div id="pagContinuar" class="ion-hide">
+          <ion-row>
+            <div id="paginacion">
+            </div>
+          </ion-row>
+          <ion-row class="espaciado_button">
+            <ion-col>             
+              <ion-button type="button" (click)="retrocederTab()" color="secondary" expand="block" shape="round" size="large">Atrás</ion-button>
+            </ion-col>
+            <ion-col>
+              <!-- Tab 1 -->
+              <ion-button *ngIf="idnavactual === 1" type="button" (click)="siguienteTab()" color="secondary" expand="block" shape="round" size="large" [disabled]="farNombreNegocioInvalido || rucInvalido || correoInvalido || formInvalido || !habilitarBotonTab1">Continuar</ion-button>
+              <!-- Tab 2 -->
+              <ion-button *ngIf="idnavactual === 2" type="button" (click)="siguienteTab(); validarCamposObligatorios()" color="secondary" expand="block" shape="round" size="large" [disabled]="habilitarBotonTab2 ">Continuar</ion-button>
+              <!-- Tab 3 -->
+              <ion-button *ngIf="idnavactual === 3" type="button" (click)="siguienteTab(); validarCamposObligatorios()" color="secondary" expand="block" shape="round" size="large" [disabled]="formInvalido || farDireccionCallesInvalido || farDireccionComInvalido || farTelefonoMovInvalido || !habilitarBotonTab3">Continuar</ion-button>
+              <!-- Tab 4 -->
+              <ion-button *ngIf="idnavactual === 4" type="button" (click)="siguienteTab()" color="secondary" expand="block" shape="round" size="large" [disabled]="formInvalido || !habilitarBotonTab4">Continuar</ion-button>
+            </ion-col>
+          </ion-row>
+        </div>
+      </ion-grid>
+    </form>
+  </ion-content>
+  <ion-footer>
+    <ion-toolbar>
+      <ion-row>
+      <ion-col class="ion-text-start">
+        <ion-nav-link class="regresar" (click)="goVentanaFarmacia()"><ion-icon name="chevron-back-outline"></ion-icon>  Regresar</ion-nav-link>
+      </ion-col>
+      <ion-col class="ion-text-end">
+        <ion-nav-link class="salir" (click)="alertaConfirmarSalida()">Salir  <ion-icon name="exit-outline"></ion-icon></ion-nav-link>
+      </ion-col>
+    </ion-row>
+    </ion-toolbar>
+  </ion-footer>
+</div>
+
+<!-- Despliegue de las opciones del menú  -->
+<ion-menu menuId="menuIzquierdo" side="start" contentId="main-content">
+  <ion-header class="ion-hide">
+    <ion-toolbar>
+      <ion-title>Menú</ion-title>
+    </ion-toolbar>
+  </ion-header>
+  <ion-content class="contenido_fondo">
+    <ion-avatar class="avatar_usuario_menu">
+      <ion-img class="img_usuario" [src]="farmacia?.farLogotipoURL" alt="Logotipo de la farmacia"></ion-img>
+    </ion-avatar>
+    <p class="msg_bienvenida titulo_paginas ion-text-center">{{ farmacia?.farNombreNegocio }}</p>
+    <ion-list>
+      <ion-item button lines="none" (click)="goGestionarPerfil()">
+        <ion-img class="img_menu" src="assets/imagenes/gestiona_perfil.png" alt="Gestionar perfil de usuario"></ion-img>
+      <p class="ion-text-start">Gestionar mi perfil de usuario</p>
+      </ion-item>
+      <ion-item button lines="none" (click)="goResetearClave()">
+        <ion-img class="img_menu" src="assets/imagenes/reset_clave.png" alt="Resetear clave de ingreso"></ion-img>
+        <p class="ion-text-start">Resetear mi clave de ingreso</p>
+      </ion-item>
+      <ion-item button lines="none" (click)="alertaConfirmarSalida()">
+        <ion-img class="img_menu" src="assets/imagenes/salir.png" alt="Salir"></ion-img>
+        <p class="ion-text-start">Salir</p>
+      </ion-item>
+    </ion-list>
+  </ion-content>
+</ion-menu>

@@ -1,0 +1,35 @@
+<ion-header class="ion-hide">
+  <ion-toolbar>
+    <ion-title>registro-erroneo</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="contenido_fondo">
+  <ion-grid class="vertical_center">
+    <ion-row>
+      <ion-col align-self-center>
+        <ion-img class="logotipo_min" src="assets/imagenes/logotipo.png" alt="LogoSeekerMedical"></ion-img>
+        <h1 class="ion-text-center titulo_paginas">Regístrate en el Sistema</h1>
+      </ion-col> 
+    </ion-row>
+    <ion-row>
+      <ion-col>
+        <ion-img class="imgerror" src="\assets\imagenes\error.png" alt="Registro erróneo"></ion-img>
+        <div class="ion-padding">
+          <h2 class="titulo_paginas ion-text-center">Error al registrar la información del usuario</h2>
+          <h2 class="titulo_paginas ion-text-center">{{ mensajeError }}</h2>
+          <p>Por favor, intenta nuevamente registrarte en el sistema.</p>
+          <p>Si estas registrado en el sistema intenta iniciar sesión.</p>
+          <p>Si olvidaste la clave dirígite a Olvidé mi clave .</p>
+          <p>Verifica que todos los datos llenados en el formulario se encuentren correctos.</p>
+          <p>En el caso de seguir manteniendo inconvenientes comunicarte con Seeker Medical</p>
+        </div>
+      </ion-col>
+    </ion-row>
+    <ion-row class="espaciado_button">
+      <ion-col>
+        <ion-button type="button" (click)="goHome()" color="secondary" expand="block" shape="round" size="large">Ir a inicio</ion-button>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+</ion-content>

@@ -1,20 +1,32 @@
-<ion-header [translucent]="true">
+<!-- ion-hide se utiliza para ocultar el elemento -->
+<ion-header class="ion-hide">
   <ion-toolbar>
-    <ion-title>
-      Blank
-    </ion-title>
+    <ion-title>home</ion-title>
   </ion-toolbar>
 </ion-header>
-
-<ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">Blank</ion-title>
-    </ion-toolbar>
-  </ion-header>
-
-  <div id="container">
-    <strong>Ready to create an app?</strong>
-    <p>Start with Ionic <a target="_blank" rel="noopener noreferrer" href="https://ionicframework.com/docs/components">UI Components</a></p>
-  </div>
+<ion-content class="contenido_fondo">
+  <ion-grid class="vertical_center">
+    <ion-row>
+      <ion-col align-self-center>
+        <ion-img class="logotipo" 
+        src="assets/imagenes/logotipo.png" 
+        alt="LogoSeekerMedical">
+        </ion-img>
+      </ion-col> 
+    </ion-row>
+    <ion-row>
+      <ion-col>
+        <p class="msg_bienvenida texto_margen_vertical_amplio">Bienvenido a <b>Seeker Medical</b>!!! 
+          <br><br>Para comenzar tu búsqueda de servicios médicos, selecciona un perfil de ingreso:
+        </p>
+      </ion-col>
+    </ion-row>
+    <ion-row>
+      <ion-col class="ion-align-self-center">
+        <ion-button [routerLink]="['/login']" [queryParams]="{tipousuario:'paciente'}" expand="block" shape="round" size="large" color="primary" fill="solid">Soy paciente</ion-button>
+        <ion-button [routerLink]="['/login']" [queryParams]="{tipousuario:'medico'}" expand="block" shape="round" size="large" color="secondary" fill="solid">Soy médico</ion-button>
+        <ion-button [routerLink]="['/login']" [queryParams]="{tipousuario:'farmacia'}" expand="block" shape="round" size="large" color="tertiary" fill="solid">Soy administrador de farmacia</ion-button>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
 </ion-content>

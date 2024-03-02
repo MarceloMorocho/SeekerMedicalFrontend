@@ -1,0 +1,9 @@
+{
+    "/sw": {
+       "target": "https://proyectomarcelomorocho.com/",
+       "changeOrigin": true,
+       "secure": false,
+       "logLevel": "debug",
+       "pathRewrite": {"^/sw" : "https://proyectomarcelomorocho.com/seeker"}
+     }
+   }

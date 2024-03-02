@@ -1,0 +1,73 @@
+<ion-header class="ion-hide">
+  <ion-toolbar>
+    <ion-title>login</ion-title>
+  </ion-toolbar>
+</ion-header>
+<ion-content class="contenido_fondo">
+  <ion-grid class="vertical_center">
+    <ion-row>
+      <ion-col align-self-center>
+        <ion-img class="logotipo_min" src="assets/imagenes/logotipo.png" alt="LogoSeekerMedical"></ion-img>
+      </ion-col> 
+    </ion-row>
+    <ion-row>
+      <ion-col>
+        <!-- /*Los corchetes, [] hacen que Angular evalúe el lado derecho de la tarea como una expresión dinámica.
+        Sin los corchetes, Angular trata el lado derecho como una cadena literal y establece la propiedad en 
+        ese valor estático*/ -->
+        <ion-img class="tipo_usuario" [src]="imgUsuario" alt="Imagen usuario"></ion-img>
+      </ion-col>
+    </ion-row>
+    <ion-row>
+      <ion-col>
+        <p class="msg_bienvenida titulo_paginas texto_margen_corto">Ingresa tus credenciales</p>
+      </ion-col>
+    </ion-row>
+    <ion-row>
+      <!-- form contiene controles interactivos que permiten a un usuario enviar información al servidor web -->
+      <form>
+        <!-- Se usa la etiqueta HTML span como contenedor para agrupar elementos en la misma línea 
+        y así poder darles estilos o manipularlos -->
+        <p>Los campos marcados con <span class="requerido">*</span> son requeridos:</p>
+        <ion-item lines="full">
+          <ion-label position="floating" color="dark"><ion-icon name="person-outline" color="dark"></ion-icon>Usuario <span class="requerido">*</span></ion-label>
+          <ion-input [(ngModel)]="username" name="username" type="text" autofocus="on" clearInput="true" clearOnEdit="true" color="dark" inputmode="text" placeholder="Número de cédula o ruc" required="true"></ion-input>
+        </ion-item>
+        <ion-item lines="full" style="position: relative;">
+          <ion-label position="floating" color="dark">
+            <ion-icon name="key-outline" color="dark"></ion-icon>Clave <span class="requerido">*</span>
+          </ion-label>
+          <ion-input [(ngModel)]="password" name="password" [type]="mostrarPassword ? 'text' : 'password'" autofocus="on" clearInput="true" clearOnEdit="true" color="dark" inputmode="text" placeholder="******" required="true">
+          </ion-input>
+          <ion-button fill="clear" size="dafault" (click)="toggleMostrarPassword()" style="cursor: pointer; position: absolute; right: 60px; bottom: 0px;">
+            <ion-icon size="small" slot="icon-only" name="eye-outline" style="vertical-align: bottom;"></ion-icon>
+          </ion-button>
+        </ion-item>
+        <div *ngIf="errorAutenticacion" class="ion-justify-content-center ion-align-items-center">
+          <p style="color: red">Usuario o contraseña incorrectos</p>
+        </div>
+        <ion-row>
+          <ion-col>
+            <ion-nav-link class="ion-float-right tlink" (click)="goOlvidoClave()">Olvidé mi clave</ion-nav-link>
+          </ion-col>
+        </ion-row>
+        <ion-row>
+          <ion-col>
+            <!-- submit : El botón envía los datos del formulario al servidor -->
+            <ion-button (click)="login()" type="submit" fill="solid" color="success" expand="block" shape="round" size="large">Iniciar Sesión</ion-button>
+          </ion-col>
+        </ion-row>
+        <ion-row class="espaciado_top">
+          <ion-col class="ion-text-center">
+            <ion-nav-link class="tlink" (click)="goRegistro()">Deseo registrarme</ion-nav-link>
+          </ion-col>
+        </ion-row>
+      </form>
+    </ion-row>
+  </ion-grid>
+</ion-content>
+<ion-footer>
+  <ion-toolbar>
+    <ion-nav-link class="regresar" (click)="goHome()"> <ion-icon name="chevron-back-outline"></ion-icon>Regresar</ion-nav-link>
+  </ion-toolbar>
+</ion-footer>

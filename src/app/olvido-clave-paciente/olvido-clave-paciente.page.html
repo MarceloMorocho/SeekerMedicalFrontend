@@ -1,0 +1,53 @@
+<ion-header class="ion-hide">
+  <ion-toolbar>
+    <ion-title>olvido-clave-paciente</ion-title>
+  </ion-toolbar>
+</ion-header>
+<ion-content class="contenido_fondo" padding #content [scrollEvents]="true">
+  <ion-grid class="vertical_center">
+    <ion-row>
+      <ion-col align-self-center>
+        <ion-img class="logotipo_min" src="assets/imagenes/logotipo.png" alt="LogoSeekerMedical"></ion-img>
+      </ion-col> 
+    </ion-row>
+    <ion-row>
+      <ion-col>
+        <p class="msg_bienvenida titulo_paginas texto_margen_corto">Olvidé mi clave</p>
+      </ion-col>
+    </ion-row>
+    <ion-row>
+      <ion-col>
+        <p>Para verificar tu identidad ingresa tu cédula y el correo electrónico personal registrado.</p>
+        <p>Si los datos ingresados coinciden con nuestros registros, te enviaremos inmediatamente
+          un correo electrónico con una clave temporal de acceso a la aplicación.</p>
+        <p>Te sugerimos modificarla inmediatamente.</p>
+        <!-- form contiene controles interactivos que permiten a un usuario enviar información a un servidor web -->
+        <form>
+          <ion-item lines="full">
+            <ion-label position="floating" color="dark"> Cédula de identidad (*)</ion-label>
+            <ion-input [(ngModel)]="paciente.pacCi" name="pacCi" type="text" autofocus="on" clearInput="true" clearOnEdit="true" color="dark" inputmode="text" placeholder="Cédula" required="true" (ionBlur)="validarCedulaEcuatorianaYExistencia(); validarCamposObligatorios()"></ion-input>
+          </ion-item>
+          <ion-item lines="full">
+            <ion-label position="floating" color="dark"> Correo electrónico (*)</ion-label>
+            <ion-input [(ngModel)]="paciente.pacCorreoElec" name="pacCorreoElec" type="email" autofocus="on" clearInput="true" clearOnEdit="true" color="dark" inputmode="text" placeholder="Correo personal" required="true" (ionBlur)="validarCorreoElec(); validarCamposObligatorios()"></ion-input>
+          </ion-item>
+          <!-- Texto de alerta cuando no se complete los campos obligatorios -->
+          <div *ngIf="formInvalido">
+            <p style="color: red">Por favor, complete todos los campos obligatorios (*)</p>
+          </div>
+        </form>
+      </ion-col>
+    </ion-row> 
+    <ion-row>
+      <ion-col>
+        <!-- submit : El botón envía los datos del formulario al servidor -->
+        <ion-button type="submit" fill="solid" color="primary" expand="block" shape="round" size="large" (click)="enviarClaveTemporal()" [disabled]="cedulaInvalido || correoInvalido || formInvalido">Enviar email con clave temporal</ion-button>
+      </ion-col>
+    </ion-row>    
+  </ion-grid>
+</ion-content>
+<ion-footer>
+  <ion-toolbar>
+    <ion-nav-link class="regresar" (click)="goHome()"> <ion-icon name="chevron-back-outline"></ion-icon> Regresar</ion-nav-link>
+  </ion-toolbar>
+</ion-footer>

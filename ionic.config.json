@@ -1,5 +1,7 @@
 {
   "name": "seeker.medical",
-  "integrations": {},
+  "integrations": {
+    "cordova": {}
+  },
   "type": "angular"
 }

@@ -24,3 +24,533 @@
 @import "~@ionic/angular/css/text-alignment.css";
 @import "~@ionic/angular/css/text-transformation.css";
 @import "~@ionic/angular/css/flex-utils.css";
+
+/* Estilos de texto */
+@font-face{
+  font-family: 'Montserrat-Regular';
+  src: url('/assets/fonts/Montserrat-Regular.woff2') format('woff2');
+}
+
+@font-face{
+  font-family: 'Montserrat-Bold';
+  src: url('/assets/fonts/Montserrat-Bold.woff2') format('woff2');
+}
+
+@font-face{
+  font-family: 'Montserrat-SemiBold';
+  src: url('/assets/fonts/Montserrat-SemiBold.woff2') format('woff2');
+}
+
+/* Estilos de fondo de pantalla */
+.contenido_fondo{
+  --background: url('/assets/imagenes/fondo.jpg') no-repeat 100% 100%;
+  --background-position:center;
+}
+
+ion-content {
+  --background:white;
+  padding: 0 5pt 0 5pt;
+}
+
+.vertical_center{
+  margin: 0;
+  position: absolute;
+  top: 50%;
+  -ms-transform: translateY(-50%);
+  transform: translateY(-50%);
+  width: 100%;
+  align-items: center;
+  justify-items: center;
+}
+
+.vertical_top{
+  margin: 0;
+  position: absolute;
+  width: 100%;
+  align-items: center;
+  justify-items: center;
+}
+
+/* Texto */
+*{
+  font-family: 'Montserrat-Regular', Helvetica;
+  color:black;
+  }
+
+p.msg_bienvenida{
+  font-size: 12pt;
+  text-align: center;
+}
+
+p.nombres_usuario{
+  font-size: 12pt;
+  text-align: center;
+  font-family: 'Montserrat-Bold', Helvetica;
+  margin-top: 50px;
+}
+
+.link_modal{
+  font-family: 'Montserrat-SemiBold',Helvetica;
+}
+
+.titulo_paginas{
+  font-family: 'Montserrat-Bold', Helvetica;
+}
+
+.sin_subrayado{
+  text-decoration: none; /* Quitar subrayado */
+  color: inherit; /* Heredar el color del texto para mantener la apariencia original */
+}
+
+b{
+  font-family: 'Montserrat-Bold', Helvetica;
+}
+
+h1{
+  font-size: 14pt;
+  padding-bottom: 5pt;
+  border-bottom: 1px dashed var(--main-bg-color);
+}
+
+h2{
+  font-size: 12pt;
+}
+
+h3{
+  font-size: 10pt;
+}
+
+p{
+  font-size:10pt;
+  text-align: justify;
+}
+
+p.paso{
+  font-size: 10pt;
+  color:var(--dark-gray);
+  font-family: 'Montserrat-Bold', Helvetica;
+}
+
+.texto_cursiva_izquierda{
+  font-style: italic;
+  text-align: left;
+}
+
+ion-input{
+  font-family: 'Montserrat-Regular',Helvetica;
+}
+
+ion-toolbar{
+  --background: #D4EBF7 !important;
+}
+
+ion-label{
+  font-family: 'Montserrat-Regular',Helvetica;
+}
+
+/* Estilos CSS */
+.horario1{
+  display: inline; /* Hace que los elementos <p> se muestren en línea */
+  margin-right: 12px; /* Ajusta el margen derecho según tus preferencias */
+  align-items: baseline; /* Alinea los elementos en la línea de base */
+  justify-content: space-between; /* Espacio uniforme entre los elementos */
+}
+
+.horario2{
+  display: inline; /* Hace que los elementos <p> se muestren en línea */
+  margin-right: 4px; /* Ajusta el margen derecho según tus preferencias */
+  align-items: baseline; /* Alinea los elementos en la línea de base */
+  justify-content: space-between; /* Espacio uniforme entre los elementos */
+}
+
+.horario3{
+  display: inline; /* Hace que los elementos <p> se muestren en línea */
+  margin-right: 4px; /* Ajusta el margen derecho según tus preferencias */
+  align-items: baseline; /* Alinea los elementos en la línea de base */
+  justify-content: space-between; /* Espacio uniforme entre los elementos */
+}
+
+.centrar-vertical{
+  display: flex;
+  align-items: center;
+}
+
+.texto_derecha{
+  text-align: right;
+}
+
+.texto_centrado{
+  text-align: center;
+  margin-top: 40px;
+}
+
+.nombre_medico{
+  margin-bottom: -8px;
+}
+
+.nombre_farmacia{
+  margin-bottom: -8px;
+}
+
+.ion_row_margen{
+  text-align: center;
+  margin-top: -8px;
+}
+
+.medico_seleccionado {
+  background-color: #f0f0f0; /* Puedes cambiar el color de fondo */
+  cursor: pointer; /* Cambia el cursor al pasar sobre el médico */
+}
+
+/* Imagenes */
+.logotipo_min{
+  max-width: 75%;
+  margin: 40px auto 0px auto;
+}
+
+.logotipo_toolbar{
+  max-width: 35%;
+  margin: auto auto auto auto;
+  display: flex;
+  justify-content: center; /* Centra horizontalmente */
+  align-items: center; /* Centra verticalmente */
+}
+
+.img_opciones{
+  max-width: 20%;
+  margin: 15px 30px 15px 30px;
+  justify-content: center;
+  display: flex;
+}
+
+.img_menu{
+  max-width: 20%;
+  margin: 10px 30px 10px 30px;
+  justify-content: center;
+  display: flex;
+}
+
+.avatar_usuario_menu{
+  display: flex;
+  align-items: center; /* Centra horizontalmente */
+  justify-content: center; /* Centra verticalmente */
+  margin: 20px auto 20px auto;
+  width: 110px; /* Ancho fijo */
+  height: auto; /* Altura ajustada automáticamente a la proporción de imagen original */
+}
+
+.img_usuario{
+  border-radius: 50%; /* Hace que la imagen sea redonda para que parezca un avatar */
+}
+
+.img_distancia{
+  max-width: 40%;
+  margin: auto 0 auto auto;
+  justify-content: flex-end; /* flex-end para alinear a la derecha */
+  display: flex;
+}
+
+.img_usuario_listado{
+  width: 100px;
+  height: 100px;
+  border-radius: 50%; /* Hace que la imagen sea redonda para que parezca un avatar */
+  margin: 10px 0px 0px  0px;
+  justify-content: center;
+  display: flex;
+}
+
+.img_usuario_inf{
+  width: 90px;
+  height: 90px;
+  border-radius: 50%; /* Hace que la imagen sea redonda para que parezca un avatar */
+  margin: 20px auto auto  auto;
+  justify-content: center;
+  display: flex;
+}
+
+.img_usuario_mapa{
+  width: 80px;
+  height: 80px;
+  border-radius: 50%; /* Hace que la imagen sea redonda para que parezca un avatar */
+  margin: 5px auto 10px  auto;
+  justify-content: center;
+  display: flex;
+}
+
+.imgterminos{
+  max-width: 30%;
+  margin: 0px auto 0px auto;
+  justify-content: center; /* Centra horizontalmente */
+  display: flex;
+}
+
+.avatar{
+  max-width: 40%; /* Asegura que la imagen se ajuste al contenedor */
+  height: auto; /* Ajusta automáticamente la altura según el ancho */
+  margin: auto auto auto auto;
+  display: flex;
+  justify-content: center; /* Centra horizontalmente */
+  align-items: center; /* Centra verticalmente */
+}
+
+.imgregistro{
+  max-width: 70%;
+  margin: 0px auto 0px auto;
+}
+
+.imgerror{
+  max-width: 30%;
+  margin: 0px auto 0px auto;
+}
+
+.img_busqueda{
+  max-width: 30%;
+  margin: 15px auto 15px auto;
+}
+
+.img_servicio{
+  width: 60px;
+  height: 60px;
+  margin: auto auto auto  auto;
+  justify-content: center;
+  display: flex;
+  filter: grayscale(0); // Establece en 1 para escala de grises, 0 para desactivar
+  transition: filter 0.3s ease-in-out;
+}
+
+.opaque{
+  opacity: 0.5; /* Puedes ajustar el valor de opacidad según tus preferencias */
+}
+
+.img_resetearClave{
+  max-width: 40%;
+  margin: 15px 0px 15px 15px;
+  justify-content: center;
+  display: flex;
+  margin-left: auto; /* Alinea a la derecha */
+}
+
+.img_gestionarPerfil{
+  max-width: 40%;
+  margin: 15px 0px 15px 15px;
+  justify-content: center;
+  display: flex;
+  margin-left: auto; /* Alinea a la derecha */
+}
+
+/* Google Maps */
+#mapa{
+  width: 100%;
+  height: 300px; /* Altura según sea necesario */
+}
+
+/* Formulario */
+form{
+  width: 100%;
+}
+
+.requerido{
+  color: #C44D58;
+}
+
+.label_checkbox{
+  font-size: 10pt !important;
+}
+
+.dcheckbox{
+  display: flex;
+  align-items: center;
+}
+
+.borde_item{
+  border: 1px solid #000;
+  border-radius: 10px;
+  width: 105px;
+}
+
+.margen_item{
+  max-width: 100%;
+  margin: 0px 60px 0px 60px;
+} 
+
+ion-label.margen_radio {
+  margin-left: 0.5rem; /* Espacio entre la etiqueta y el radio */
+  margin-right: 1rem;
+}
+
+.transparencia_ion_list_inf{
+  background: transparent; /* Ajusta la transparencia */
+}
+
+ion-item{
+  --background: none;
+  margin-bottom: 10pt;
+}
+
+ion-item.contenedor-val::part(native) {
+  border-color: black;
+  border-style: solid;
+  border-width: 1px;
+  border-radius: 5pt;
+}
+
+ion-checkbox {
+  --background: none;
+  --background-checked: var(--main-bg-color);
+  margin: 0 10pt 0 0;
+  width: 22pt;
+  height: 18pt;
+}
+
+ion-checkbox::part(container) {
+  border-radius: 5px;
+  border: 1px solid black;
+}
+
+ion-row.formulario ion-item{
+  font-size:8pt; 
+}
+
+ion-radio-group { /* Estilos para ion-radio-group */
+  display: flex;
+  justify-content: space-between; /* Distribuir elementos uniformemente */
+  margin-top: 10px;
+  margin-bottom: -15px;
+}
+
+agm-map{
+  width: 100%;
+  height: calc(100vh - 164px);
+}
+
+::placeholder { /* Estilo de placeholder */
+  color: #999; /* Cambia el color del placeholder a gris claro */
+  font-size: 14px;
+  text-align: justify;
+}
+
+ion-select::part(placeholder) { /* Estilo de placeholder del ion-select */
+  color: #999; /* Cambia el color del placeholder a gris claro */
+  font-size: 14px;
+  text-align: justify;
+}
+
+/* Navegacion */
+.regresar{
+  font-size: large;
+  font-weight: bold;
+  margin-left: 10pt;
+}
+
+.filtrar{
+  font-size: large;
+  font-weight: bold;
+}
+
+.salir{
+  font-size: large;
+  font-weight: bold;
+  margin-right: 10pt;
+}
+
+/* Botones */
+.espaciado_button{
+  margin-bottom:80pt;
+  margin-top: 10px;
+}
+
+.ancho_button{ 
+  width: 200px; /* Reduce el ancho */
+}
+
+.centrar_button{
+  text-align: center; /* Centra horizontalmente el botón */
+}
+
+ion-button{
+  margin-top: 15pt;
+  font-family: 'Montserrat-Bold',Helvetica;
+  text-transform: none;
+  font-size: medium;
+}
+
+.ion_button_telefono{
+  margin-top: 0px;
+  font-family: 'Montserrat-Bold',Helvetica;
+  text-transform: none;
+  font-size: medium;
+}
+
+ /* Colores fuentes */
+:root {
+  --main-bg-color: #035F6B;
+  --sec-bg-color:#05B4CC;
+  --ter-bg-color:#59C3E4; 
+  --dark-gray:#343838;
+  --mid-grayco:rgba(0, 0, 0, 0.4); //color con opacidad
+  --light-gray:#D4D6D6;
+  --whiteco:rgba(255, 255, 255, 0.4);
+}
+
+.btn-conf{
+  --color: black !important;
+  --border-radius: 10pt;
+  --opacity:100%;
+  width: 100%;
+  margin-top:0pt !important;
+  font-size: smaller;
+}
+
+.btn-secundario{
+  --background: var(--light-gray);
+  --background-hover: var(--gray);
+  --background-activated: var(--gray);
+  --background-focused: var(--gray);
+}
+
+.btn-terciario{
+  --background: var(--whiteco);
+  --background-hover: var(--light-gray);
+  --background-activated: var(--light-gray);
+  --background-focused: var(--light-gray);
+}
+
+/* Estilos para las páginas interactivas */
+#pagina{
+  width: 100%;
+}
+  
+#paginacion{
+  align-items: center;
+  justify-items: center;
+  width: 100%;
+}
+
+.bull-li{
+  padding: 0px 10px 0px 0px;
+  text-align: center;
+}
+
+.bull-li li{
+  text-align: center;
+  display: inline-block;
+  width: 25pt;
+  height: 25pt;
+  line-height: 25pt;
+  border-radius: 50%;
+  color: var(--mid-grayco);
+  background: transparent;
+  border: 1px solid var(--main-bg-color);
+  margin-right: 8px;
+  font-size: 10pt;
+}
+  
+.bull-li li.active{
+  background: var(--main-bg-color);
+  border: 1px solid var(--main-bg-color);
+  color:white;
+}
+
+.alert-wrapper {
+  background: var(--sec-bg-color) !important;
+}

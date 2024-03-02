@@ -1,0 +1,186 @@
+<ion-header class="ion-hide">
+  <ion-toolbar>
+    <ion-title>registrar-paciente</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<!-- Padding se utiliza para agregar un espacio de relleno al contenido dentro de este componente -->
+<ion-content class="contenido_fondo" padding #content [scrollEvents]="true">
+  <!-- Formulario de registro del paciente -->
+  <form (ngSubmit)="registrarPaciente()">
+    <ion-grid class="vertical_top">
+      <ion-row>
+        <ion-col align-self-center>
+          <ion-img class="logotipo_min" src="assets/imagenes/logotipo.png" alt="Logo SeekerMedical"></ion-img>
+          <h1 class="ion-text-center titulo_paginas">Regístrate en el Sistema</h1>
+        </ion-col> 
+      </ion-row>
+
+      <!-- Formulario que se habilita en el tab1 -->
+      <div id="tab1" class="ion-hide">
+        <ion-row>
+          <ion-col>
+            <p>Seeker Médical es una aplicación móvil para la búsqueda de médicos y farmacias en el cantón Cuenca.</p>
+          </ion-col>
+        </ion-row>
+        <ion-row>
+          <ion-col>
+            <p class="paso">Primer paso</p>
+            <h2 class="titulo_paginas">Acepta los términos y condiciones</h2>
+            <p>Para continuar con el registro, debes aceptar los términos y condiciones de servicio</p>
+            <div class="dcheckbox">
+              <ion-checkbox slot="start" disabled="false" [(ngModel)]="terminos" name="aceptaTerminos" [ngModelOptions]="{standalone: true}" (ionChange)="onTerminosChecked($event)"></ion-checkbox>
+              <ion-label class="ion-text-wrap label_checkbox">Entiendo y Acepto los <ion-nav-link class="link_modal" (click)="setOpen(true)">Términos y Condiciones de Servicio</ion-nav-link></ion-label>
+            </div>
+          </ion-col>
+        </ion-row>
+      </div>
+      
+      <!-- Formulario que se habilita en el tab2 -->
+      <div id="tab2" class="ion-hide">
+        <ion-row>
+          <ion-col>
+            <p class="paso">Segundo paso</p>
+            <h2 class="titulo_paginas">Ingresa tu información personal</h2>
+            <ion-item lines="full">
+              <ion-label position="floating" color="dark">Nombres (*)</ion-label>
+              <ion-input [(ngModel)]="paciente.pacNombres" name="pacNombres" type="text" autofocus="on" clearInput="true" clearOnEdit="true" color="dark" inputmode="text" placeholder="Primer y segundo nombre" required="true" (ionBlur)="validarCamposObligatorios(); validarNombres()"></ion-input>
+            </ion-item>
+            <div *ngIf="pacNombresInvalido">
+              <p style="color: red">El nombre debe tener mínimo 3 caracteres</p> 
+            </div>
+            <ion-item lines="full">
+              <ion-label position="floating" color="dark">Apellidos (*)</ion-label>
+              <ion-input [(ngModel)]="paciente.pacApellidos" name="pacApellidos" type="text" autofocus="on" clearInput="true" clearOnEdit="true" color="dark" inputmode="text" placeholder="Primer y segundo apellido" required="true" (ionBlur)="validarCamposObligatorios(); validarApellidos()"></ion-input>
+            </ion-item>
+            <div *ngIf="pacApellidosInvalido">
+              <p style="color: red">El apellido debe tener mínimo 3 caracteres</p> 
+            </div>
+            <ion-item lines="full">
+              <ion-label position="floating" color="dark">Cédula de identidad (*)</ion-label>
+              <ion-input [(ngModel)]="paciente.pacCi" name="pacCi" type="text" autofocus="on" clearInput="true" clearOnEdit="true" color="dark" inputmode="text" placeholder="Cédula" required="true" (ionBlur)="validarCedulaEcuatorianaYExistencia(); validarCamposObligatorios()"></ion-input>
+            </ion-item>
+            <ion-item lines="full">
+              <ion-label position="floating" color="dark">Correo electrónico (*)</ion-label>
+              <ion-input [(ngModel)]="paciente.pacCorreoElec" name="pacCorreoElec" type="email" autofocus="on" clearInput="true" clearOnEdit="true" color="dark" inputmode="text" placeholder="Correo personal" required="true" (ionBlur)="validarCorreoElec(); validarCamposObligatorios()"></ion-input>
+            </ion-item>
+            <ion-item lines="full">
+              <ion-label position="floating" color="dark">Teléfono móvil (*)</ion-label>
+              <ion-input [(ngModel)]="paciente.pacTelefonoMov" name="pacTelefonoMov" type="text" autofocus="on" clearInput="true" clearOnEdit="true" color="dark" inputmode="text" placeholder="xxxxxxxxxx" required="true" (ionBlur)="validarCamposObligatorios(); validarTelefonoMov()"></ion-input>
+            </ion-item>
+            <!-- Texto de alerta cuando el número de teléfono móvil sea inválido -->
+            <div *ngIf="pacTelefonoMovInvalido">
+              <p style="color: red">El número del teléfono móvil debe tener 10 dígitos</p> 
+            </div>
+            <ion-item lines="full">
+              <!-- lazy-loading o carga diferida: técnica que pospone la carga de recursos no esenciales. Estos recursos solo cargarán 
+              a la hora de ser visualizados, es decir, cuando haga falta -->
+              <ion-label position="fixed" color="dark">Fotografía</ion-label>
+              <ion-icon lazy="true" name="image"></ion-icon>
+              <ion-input type="file"  accept="image/*" (change)="cargarFotografia($event)"></ion-input>
+            </ion-item>  
+            <ion-item>
+              <ion-avatar class="avatar_usuario_menu">
+                <ion-img *ngIf="selectedFile" [src]="getSelectedFileUrl()" alt="Foto del paciente"></ion-img>
+                <ion-img *ngIf="!selectedFile" [src]="defaultAvatarUrl" alt="Avatar predeterminado"></ion-img>
+              </ion-avatar>
+            </ion-item>
+            <!-- Texto de alerta cuando no se complete los campos obligatorios -->
+            <div *ngIf="formInvalido">
+              <p style="color: red">Por favor, complete todos los campos obligatorios (*)</p>
+            </div>
+          </ion-col>
+        </ion-row>
+      </div>
+
+      <!-- Formulario que se habilita en el tab3 -->
+      <div id="tab3" class="ion-hide">
+        <ion-row>
+          <ion-col>
+            <p class="paso">Tercer paso</p>
+            <h2 class="titulo_paginas">Configura tu clave de acceso</h2>
+          </ion-col>
+        </ion-row>
+        <ion-row>
+          <ion-col>
+            <ion-item lines="full">
+              <ion-label position="floating" color="dark">Clave de acceso (*) </ion-label>
+              <ion-input [(ngModel)]="paciente.pacClave" name="pacClave" type="password" autofocus="on" clearInput="true" clearOnEdit="true" color="dark" inputmode="text" placeholder="xxxxxx" required="true" (ionBlur)="validarCamposObligatorios(); validarClave()"></ion-input>
+            </ion-item>
+            <div *ngIf="pacClaveInvalido">
+              <p style="color: red">La clave es muy corta, debe tener mínimo 8 caracteres</p> 
+            </div>
+          </ion-col>
+          <ion-col>
+            <ion-item lines="full">
+              <ion-label position="floating" color="dark">Confirma tu clave (*)</ion-label>
+              <ion-input [(ngModel)]="pacConfirmarClave" name="pacConfirmarClave" type="password" autofocus="on" clearInput="true" clearOnEdit="true" color="dark" inputmode="text" placeholder="xxxxxx" required="true" (ionBlur)="validarCamposObligatorios(); compararClaves()"></ion-input>
+            </ion-item>
+            <!-- Texto de alerta cuando las claves sean diferentes -->
+            <div *ngIf="clavesDifieren">
+              <p style="color: red">Las contraseñas no coinciden</p>
+            </div>
+          </ion-col>
+          <!-- Texto de alerta cuando no se complete los campos obligatorios -->
+          <div *ngIf="formInvalido">
+            <p style="color: red">Por favor, complete todos los campos obligatorios (*)</p>
+          </div>
+        </ion-row>
+      </div>
+    
+      <!-- Utilizado para el cambio de página y habilitar el botón continuar -->
+      <div id="pagContinuar" class="ion-hide">
+        <ion-row>
+          <div id="paginacion">
+          </div>
+        </ion-row>
+        <ion-row class="espaciado_button">
+          <ion-col>            
+            <ion-button type="button" (click)="retrocederTab()" color="secondary" expand="block" shape="round" size="large">Atrás</ion-button>
+          </ion-col>
+          <ion-col>
+            <!-- Tab 1 -->
+            <ion-button *ngIf="idnavactual === 1" type="button" (click)="siguienteTab()" color="secondary" expand="block" shape="round" size="large">Continuar</ion-button>
+            <!-- Tab 2 -->
+            <ion-button *ngIf="idnavactual === 2" type="button" (click)="siguienteTab()" [disabled]="cedulaInvalido || correoInvalido || formInvalido || pacNombresInvalido || pacApellidosInvalido || pacTelefonoMovInvalido || !habilitarBotonTab2" color="secondary" expand="block" shape="round" size="large">Continuar</ion-button> 
+            <!-- Tab 3 -->
+            <ion-button *ngIf="idnavactual === 3" type="button" (click)="siguienteTab()" color="secondary" expand="block" shape="round" size="large" [disabled]="clavesDifieren || pacClaveInvalido || !habilitarBotonTab3">Continuar</ion-button>
+          </ion-col>
+        </ion-row>
+      </div>
+    </ion-grid>
+
+    <!-- ion-modal se utiliza para mostrar la pantalla con los términos y condiciones -->
+    <ion-modal [isOpen]="isModalOpen">
+      <ng-template>
+        <ion-header>
+          <ion-toolbar>
+            <ion-title>Importante</ion-title>
+            <ion-buttons slot="end">
+              <ion-button (click)="setOpen(false)">Cerrar</ion-button>
+            </ion-buttons>
+          </ion-toolbar>
+        </ion-header>
+        <ion-content class="ion-padding">
+          <h2 class="ion-text-center"><b>Términos y Condiciones de Servicio</b></h2>
+          <ion-img class="imgterminos" src="\assets\imagenes\terminos.png" alt="LogoTerminos"></ion-img>
+          <div class="ion-padding">
+            <p><ion-icon name="checkmark-outline"></ion-icon> El usuario se compromete a utilizar la aplicación únicamente para el fin establecido (búsqueda de servicios médicos).</p>
+            <p><ion-icon name="checkmark-outline"></ion-icon> El usuario no puede realizar ni contratar servicios para ejecutar la ingeneniería inversa para replicar, dañar o alterar el funcionamiento de la aplicación.</p>
+            <p><ion-icon name="checkmark-outline"></ion-icon> El usuario es responsable de informar oportunamente al grupo Seeker Medical cualquier fallo, error, que puede afectar a la aplicación.</p>
+            <p><ion-icon name="checkmark-outline"></ion-icon> Cualquier daño o uso indebido de la aplicación es responsabilidad del usuario y deberá indenmizar al grupo Seeker Medical.</p>
+            <p><ion-icon name="checkmark-outline"></ion-icon> Le recordamos que el servicio ofertado en esta aplicación está sujeta a la disponibilidad y características del proveedor de servicios médicos, por lo que el grupo 
+            Seeker Medical no nos responsabilizamos por fallas en el servicio médico ofertado.</p>
+            <p><ion-icon name="checkmark-outline"></ion-icon> El grupo Seeker Medical se compromete a resguardar toda la información cumpliendo con lo establecido en las leyes ecuatorianas.</p>
+            <p><ion-icon name="checkmark-outline"></ion-icon> Todo el contenido desarrollado en la aplicación es propiedad del grupo Seeker Medical.</p>  
+          </div>
+        </ion-content>
+      </ng-template>
+    </ion-modal>
+  </form>
+</ion-content>
+<ion-footer>
+  <ion-toolbar>
+    <ion-nav-link class="regresar" (click)="goHome()"> <ion-icon name="chevron-back-outline"></ion-icon>Regresar</ion-nav-link>
+  </ion-toolbar>
+</ion-footer>

@@ -1,0 +1,276 @@
+<div class="ion-page" id="main-content">
+  <ion-header>
+    <ion-toolbar>
+      <!-- Menú 1 en el lado izquierdo -->
+      <ion-buttons slot="start" >
+        <ion-menu-button aria-label="Abrir menú izquierdo" (click)="abrirMenuIzquierdo()" auto-hide="false"></ion-menu-button>
+        <div class="logotipo_toolbar">
+          <ion-img src="assets/imagenes/logotipo.png" alt="Logo Seeker Medical"></ion-img>
+        </div>
+      </ion-buttons>
+      <ion-title class="ion-hide">informacion-farmacia</ion-title>
+    </ion-toolbar>
+  </ion-header>
+  <ion-content class="contenido_fondo">
+    <ion-item lines="none"> 
+      <ion-list class="transparencia_ion_list_inf" role="list" aria-label="Información del médico">
+        <ion-row>
+          <ion-col size="4">
+            <ion-avatar>
+              <ion-img class="img_usuario_inf" [src]="farmacia.farLogotipoURL" alt="Logotipo de la farmacia"></ion-img>
+            </ion-avatar>
+          </ion-col>
+          <ion-col>
+            <h2 class="nombre_farmacia">{{ farmacia.farNombreNegocio }}</h2>
+            <ion-row>
+              <ion-col>
+                <p class="texto_cursiva_izquierda">{{ farmacia.farDireccionCalles }}</p>
+              </ion-col>
+              <ion-col *ngIf="ubicacionActivada">
+                <p class="texto_derecha" *ngIf="farmacia.distanciaDesdeUsuario?.valor && farmacia.distanciaDesdeUsuario?.unidad">
+                  <ion-img class="img_distancia" src="assets/imagenes/distancia.png" alt="Distancia"></ion-img>
+                  {{ farmacia.distanciaDesdeUsuario.valor | number: '1.2-2' }} {{ farmacia.distanciaDesdeUsuario.unidad }}
+                </p>
+              </ion-col>                           
+            </ion-row>
+          </ion-col>
+        </ion-row>
+        <ion-row>
+          <ion-col>
+            <p><b>Características del servicio</b></p>
+            <p>{{ farmacia.caracteristicasServicio }}</p>
+            <ion-row>
+              <ion-col [class.opaque]="!farmacia.farTagD">
+                <ion-img class="img_servicio" src="assets/imagenes/atencion_domicilio.png" alt="Atención a domicilio"></ion-img>
+                <p>Atención a domicilio</p>
+              </ion-col>
+              <ion-col [class.opaque]="!farmacia.farTag247">
+                <ion-img class="img_servicio" src="assets/imagenes/servicio_247.png" alt="Servicio 24/7"></ion-img>
+                <p>Servicios médicos 24/7</p>
+              </ion-col>
+            </ion-row>
+          </ion-col>
+        </ion-row>
+        <p><b>Información de contacto</b></p>
+        <ion-row>
+          <ion-col *ngIf="farmacia.farTelefonoCon">
+            <p class="texto_cursiva_izquierda">Teléfono fijo</p>
+            <p>{{ farmacia.farTelefonoCon }}</p>
+            <ion-button class="ion_button_telefono" type="button" color="primary" shape="round" fill="outline" size="small"><ion-icon name="call" color="primary" size="small"></ion-icon><p style="color: var(--ion-color-primary);" aria-label="Llamar a la farmacia al teléfono convencional" (click)="llamarFarmaciaCon(farmacia.farTelefonoCon)">Llamar</p></ion-button>
+          </ion-col>
+          <ion-col>
+            <p class="texto_cursiva_izquierda">Teléfono móvil</p>
+            <p>{{ farmacia.farTelefonoMov }}</p>
+            <ion-button class="ion_button_telefono" type="button" color="primary" shape="round" fill="outline" size="small"><ion-icon name="call" color="primary" size="small"></ion-icon><p style="color: var(--ion-color-primary);" aria-label="Llamar a la farmacia al celular" (click)="llamarFarmaciaMov(farmacia.farTelefonoMov)">Llamar</p></ion-button>
+          </ion-col>
+          <ion-col *ngIf="farmacia && farmacia.farTagW">
+            <p class="texto_cursiva_izquierda">Whatsapp</p>
+            <p>{{ farmacia.farTelefonoMov }}</p>
+            <ion-button class="ion_button_telefono" type="button" color="success" shape="round" fill="outline" size="small" aria-label="Abrir whatsapp" (click)="abrirWhatsApp()">
+              <ion-icon name="logo-whatsapp" color="success" size="small"></ion-icon>
+              <p style="color: var(--ion-color-success);">Chatear</p>
+            </ion-button>
+          </ion-col>
+        </ion-row>
+        <p><b>Información de ubicación</b></p>
+        <ion-row>
+          <ion-col size="3" class="centrar-vertical">
+            <p class="texto_cursiva_izquierda">Horarios de atención</p>
+          </ion-col>    
+          <ion-col *ngIf="farmacia.horariosAtencion && farmacia.horariosAtencion.length > 0">
+            <div *ngFor="let horario of farmacia.horariosAtencion">
+              <!-- Agregado: Mostrar p solo si hay diaDescripcion -->            
+              <p class="horario1" *ngIf="horario.diaDescripcion">{{ horario.diaDescripcion ? '' + horario.diaDescripcion : '' }}</p>
+              <p class="horario2" *ngIf="horario.hm1Inicio || horario.hm1Fin">{{ horario.hm1Inicio ? '' + horario.hm1Inicio : '' }} {{ horario.hm1Fin ? ' a ' + horario.hm1Fin : '' }}</p>
+              <p class="horario3" *ngIf="horario.hm2Inicio || horario.hm2Fin">{{ horario.hm2Inicio ? '- ' + horario.hm2Inicio : '' }} {{ horario.hm2Fin ? ' a ' + horario.hm2Fin : '' }}</p>                   
+              <br *ngIf="horario.diaDescripcion">
+            </div>
+          </ion-col>
+        </ion-row>
+        <ion-row>
+          <ion-col size="3" class="centrar-vertical">
+            <p class="texto_cursiva_izquierda">Dirección</p>
+          </ion-col>    
+          <ion-col>
+            <p>Calles: {{ farmacia.farDireccionCalles }}</p>
+            <p>Edificio/piso: {{ farmacia.farDireccionCom}}</p>
+            <p *ngIf="farmacia.farDireccionRef">Referencia: {{ farmacia.farDireccionRef}}</p>
+          </ion-col>
+        </ion-row>
+        <ion-row>
+          <ion-col>
+            <ion-button class="ion_button_telefono" type="button" [color]="estaAbierto(farmacia) ? 'success' : 'danger'" aria-label="Disponibilidad abierto o cerrado" shape="round" fill="outline" size="small">
+              <p [style.color]="estaAbierto(farmacia) ? 'var(--ion-color-success)' : 'var(--ion-color-danger)'">
+                {{ estaAbierto(farmacia) ? 'Abierto' : 'Cerrado' }}
+              </p>
+            </ion-button>
+          </ion-col>    
+          <ion-col>
+            <ion-button class="ion_button_telefono" type="button" color="primary" shape="round" fill="outline" size="small" aria-label="Abrir Google Maps" (click)="abrirGoogleMaps(farmacia.farUbicacionLat, farmacia.farUbicacionLon)">
+              <ion-icon name="location-outline" color="primary" size="small"></ion-icon>
+              <p style="color: var(--ion-color-primary);">Ir a la ubicación</p>
+            </ion-button>
+          </ion-col>
+        </ion-row>
+      </ion-list>
+    </ion-item>
+  </ion-content>
+  <ion-footer>
+    <ion-toolbar>
+      <ion-row>
+        <ion-col class="ion-text-start">
+          <ion-nav-link class="regresar" (click)="goListadoFarmacia()"><ion-icon name="chevron-back-outline"></ion-icon>  Regresar</ion-nav-link>
+        </ion-col>
+        <ion-col class="ion-text-end">
+          <ion-nav-link class="salir" (click)="alertaConfirmarSalida()">Salir  <ion-icon name="exit-outline"></ion-icon></ion-nav-link>
+        </ion-col>
+      </ion-row>
+    </ion-toolbar>
+  </ion-footer>
+</div>
+
+<!-- Despliegue de las opciones del menú -->
+<ion-menu menuId="menuIzquierdo" side="start" contentId="main-content">
+  <ion-header class="ion-hide">
+    <ion-toolbar>
+      <ion-title>Menú</ion-title>
+    </ion-toolbar>
+  </ion-header>
+  <ion-content class="contenido_fondo">
+    <ion-avatar class="avatar_usuario_menu">
+      <ion-img class="img_usuario" [src]="paciente?.pacFotografiaURL" alt="Foto del paciente"></ion-img>
+    </ion-avatar>
+    <p class="msg_bienvenida titulo_paginas ion-text-center">{{ paciente?.pacNombres }} {{ paciente?.pacApellidos }}</p>
+    <ion-list>
+      <ion-item button id="popover_menu_farmacia" lines="none">
+        <ion-img class="img_menu" src="assets/imagenes/busca_farmacia.png" alt="Buscar farmacia"></ion-img>
+        <p class="ion-text-start">Buscar farmacias</p>
+      </ion-item>
+      <!-- Despliegue del ion-popover para buscar farmacias -->
+      <!-- dismissOnSelect es una propiedad para cerrar automáticamente la ventana emergente cuando se hace clic en su contenido -->
+      <ion-popover trigger="popover_menu_farmacia" [dismissOnSelect]="true">
+        <ng-template>
+          <ion-content>
+            <h2 class="msg_bienvenida titulo_paginas ion-text-center">¿Cómo deseas realizar la búsqueda?</h2>
+            <ion-list>
+              <ion-item button (click)="goBuscarFarmaciaListado()">
+                <ion-img class="img_busqueda" src="assets/imagenes/busqueda_listado.png" alt="Búsqueda mediante un listado"></ion-img>
+                <p class="ion-text-start">Mediante un listado</p>
+              </ion-item>
+              <ion-item button (click)="goBuscarFarmaciaMapa()">
+                <ion-img class="img_busqueda" src="assets/imagenes/busqueda_mapa.png" alt="Búsqueda mediante un mapa"></ion-img>
+                <p class="ion-text-start">Mediante un mapa</p>
+              </ion-item>
+            </ion-list>
+          </ion-content>
+        </ng-template>
+      </ion-popover>
+      <ion-item button id="popover_menu_medico" lines="none">
+        <ion-img class="img_menu" src="assets/imagenes/busca_medico.png" alt="Buscar medico"></ion-img>
+        <p class="ion-text-start">Buscar médicos</p>
+      </ion-item>
+      <!-- Despliegue del ion-popover para buscar médicos -->
+      <!-- dismissOnSelect es una propiedad para cerrar automáticamente la ventana emergente cuando se hace clic en su contenido -->
+      <ion-popover trigger="popover_menu_medico" [dismissOnSelect]="true">
+        <ng-template>
+          <ion-content>
+            <h2 class="msg_bienvenida titulo_paginas ion-text-center">¿Cómo deseas realizar la búsqueda?</h2>
+            <ion-list>
+              <ion-item button (click)="goBuscarMedicoListado()">
+                <ion-img class="img_busqueda" src="assets/imagenes/busqueda_listado.png" alt="Búsqueda mediante listado"></ion-img>
+                <p class="ion-text-start">Mediante un listado</p>
+              </ion-item>
+              <ion-item button (click)="goBuscarMedicoMapa()">
+                <ion-img class="img_busqueda" src="assets/imagenes/busqueda_mapa.png" alt="Búsqueda mediante mapa"></ion-img>
+                <p class="ion-text-start">Mediante un mapa</p>
+              </ion-item>
+            </ion-list>
+          </ion-content>
+        </ng-template>
+      </ion-popover>
+      <ion-item button lines="none" (click)="goGestionarPerfil()">
+        <ion-img class="img_menu" src="assets/imagenes/gestiona_perfil.png" alt="Gestionar perfil de usuario"></ion-img>
+        <p class="ion-text-start">Gestionar mi perfil de usuario</p>
+      </ion-item>
+      <ion-item button lines="none" (click)="goResetearClave()">
+        <ion-img class="img_menu" src="assets/imagenes/reset_clave.png" alt="Resetear clave de ingreso"></ion-img>
+        <p class="ion-text-start">Resetear mi clave de ingreso</p>
+      </ion-item>
+      <ion-item button lines="none" (click)="alertaConfirmarSalida()">
+        <ion-img class="img_menu" src="assets/imagenes/salir.png" alt="Salir"></ion-img>
+        <p class="ion-text-start">Salir</p>
+      </ion-item>
+      <ion-header class="ion-hide">
+        <ion-toolbar>
+          <ion-title>Menú</ion-title>
+        </ion-toolbar>
+      </ion-header>
+      <ion-content class="contenido_fondo">
+        <ion-avatar class="avatar_usuario_menu">
+          <ion-img class="img_usuario" [src]="paciente?.pacFotografiaURL" alt="Foto del paciente"></ion-img>
+        </ion-avatar>
+        <p class="msg_bienvenida titulo_paginas ion-text-center">{{ paciente?.pacNombres }} {{ paciente?.pacApellidos }}</p>
+        <ion-list>
+          <ion-item button id="popover_menu_farmacia" lines="none">
+            <ion-img class="img_menu" src="assets/imagenes/busca_farmacia.png" alt="Buscar farmacia"></ion-img>
+            <p class="ion-text-start">Buscar farmacias</p>
+          </ion-item>
+          <!-- Despliegue del ion-popover para buscar farmacias -->
+          <!-- dismissOnSelect es una propiedad para cerrar automáticamente la ventana emergente cuando se hace clic en su contenido -->
+          <ion-popover trigger="popover_menu_farmacia" [dismissOnSelect]="true">
+            <ng-template>
+              <ion-content>
+                <h2 class="msg_bienvenida titulo_paginas ion-text-center">¿Cómo deseas realizar la búsqueda?</h2>
+                <ion-list>
+                  <ion-item button (click)="goBuscarFarmaciaListado()">
+                    <ion-img class="img_busqueda" src="assets/imagenes/busqueda_listado.png" alt="Búsqueda mediante un listado"></ion-img>
+                    <p class="ion-text-start">Mediante un listado</p>
+                  </ion-item>
+                  <ion-item button (click)="goBuscarFarmaciaMapa()">
+                    <ion-img class="img_busqueda" src="assets/imagenes/busqueda_mapa.png" alt="Búsqueda mediante un mapa"></ion-img>
+                    <p class="ion-text-start">Mediante un mapa</p>
+                  </ion-item>
+                </ion-list>
+              </ion-content>
+            </ng-template>
+          </ion-popover>
+          <ion-item button id="popover_menu_medico" lines="none">
+            <ion-img class="img_menu" src="assets/imagenes/busca_medico.png" alt="Buscar medico"></ion-img>
+            <p class="ion-text-start">Buscar médicos</p>
+          </ion-item>
+          <!-- Despliegue del ion-popover para buscar médicos -->
+          <!-- dismissOnSelect es una propiedad para cerrar automáticamente la ventana emergente cuando se hace clic en su contenido -->
+          <ion-popover trigger="popover_menu_medico" [dismissOnSelect]="true">
+            <ng-template>
+              <ion-content>
+                <h2 class="msg_bienvenida titulo_paginas ion-text-center">¿Cómo deseas realizar la búsqueda?</h2>
+                <ion-list>
+                  <ion-item button (click)="goBuscarMedicoListado()">
+                    <ion-img class="img_busqueda" src="assets/imagenes/busqueda_listado.png" alt="Búsqueda mediante listado"></ion-img>
+                    <p class="ion-text-start">Mediante un listado</p>
+                  </ion-item>
+                  <ion-item button (click)="goBuscarMedicoMapa()">
+                    <ion-img class="img_busqueda" src="assets/imagenes/busqueda_mapa.png" alt="Búsqueda mediante mapa"></ion-img>
+                    <p class="ion-text-start">Mediante un mapa</p>
+                  </ion-item>
+                </ion-list>
+              </ion-content>
+            </ng-template>
+          </ion-popover>
+            <ion-item button lines="none" (click)="goGestionarPerfil()">
+              <ion-img class="img_menu" src="assets/imagenes/gestiona_perfil.png" alt="Gestionar perfil de usuario"></ion-img>
+              <p class="ion-text-start">Gestionar mi perfil de usuario</p>
+            </ion-item>
+            <ion-item button lines="none" (click)="goResetearClave()">
+              <ion-img class="img_menu" src="assets/imagenes/reset_clave.png" alt="Resetear clave de ingreso"></ion-img>
+              <p class="ion-text-start">Resetear mi clave de ingreso</p>
+            </ion-item>
+            <ion-item button lines="none" (click)="alertaConfirmarSalida()">
+              <ion-img class="img_menu" src="assets/imagenes/salir.png" alt="Salir"></ion-img>
+              <p class="ion-text-start">Salir</p>
+            </ion-item>
+        </ion-list>
+      </ion-content>
+    </ion-list>
+  </ion-content>
+</ion-menu>
